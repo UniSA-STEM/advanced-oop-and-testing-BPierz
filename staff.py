@@ -7,6 +7,7 @@ Username: bizvy001
 This is my own work as defined by the University's Academic Integrity Policy.
 '''
 
+from animal import Animal
 
 class Staff:
 
@@ -18,6 +19,14 @@ class Staff:
 
     def feed(self, animal):
         pass
+
+    def read_log(self, animal: Animal):
+        log = animal.log
+        print(f"{animal.name}'s log:")
+
+        for entry in log:
+            print(f"Date: {entry.date} | Issue: {entry.issue} | Severity: {entry.str_severity()}")
+
 
 
 

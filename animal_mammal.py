@@ -21,5 +21,5 @@ class Mammal(Animal):
     def make_sound(self):
         info = MAMMAL_DATA[self._species]
         sound = info.get("sound")
-        print (f'{self.name}: "{sound}"')
+        print (f'{self.name}: "{sound}"\n')
 

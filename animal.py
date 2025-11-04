@@ -20,6 +20,7 @@ class Animal(ABC):
         self.__age = age
         self.__hunger = 0
         self.__thirst = 0
+        self.__log = []
 
 
 
@@ -36,6 +37,10 @@ class Animal(ABC):
             if self.name == other.name:
                 return True
 
+    @property
+    def log(self):
+        return self.__log
+
     @abstractmethod
     def make_sound(self):
         pass
@@ -49,4 +54,7 @@ class Animal(ABC):
     def sleep(self):
         pass
 
+
+    def add_log_entry(self, log_entry):
+        self.__log.append(log_entry)
 
