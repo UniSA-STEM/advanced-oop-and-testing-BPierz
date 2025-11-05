@@ -10,16 +10,24 @@ from animal import Animal
 from zoo_data import MAMMAL_DATA
 
 class Mammal(Animal):
-    MAMMALS = list(MAMMAL_DATA.keys())
+    DATA = MAMMAL_DATA
+    MAMMALS = list(DATA.keys())
 
     def __init__(self, name: str, species: str, age: int):
         super().__init__(name, species, age)
+        self.__enclosure = self.DATA[self.species]["enclosure"]
 
         if species not in self.MAMMALS:
             raise ValueError(f"Mammal: {species} not in database")
 
+    @property
+    def enclosure(self):
+        return self.__enclosure
+
+
+
     def make_sound(self):
-        info = MAMMAL_DATA[self.species]
+        info = self.DATA[self.species]
         sound = info.get("sound")
         print (f'{self.name}: "{sound}"\n')
 

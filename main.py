@@ -46,3 +46,9 @@ ZooSystem.display_log("MotoMoto")
 
 ZooSystem.remove_animal("Blue")
 print(ZooSystem.animals)
+ZooSystem.add_enclosure(100, "Savannah")
+print(ZooSystem.enclosures)
+
+# Testing assigning animals to enclosures
+ZooSystem.assign_animal("MotoMoto", "100Sav1")
+print(ZooSystem.enclosures[0].contains)
