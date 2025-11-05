@@ -33,6 +33,8 @@ MAMMAL_DATA = {
     "Dolphin": {"class": "mammal", "diet": "carnivore", "enclosure": "Aquarium", "min_size": 300, "sound": "click"}
 }
 
+MAMMAL_ENCLOSURES = list(set(info["enclosure"] for info in MAMMAL_DATA.values()))
+
 REPTILE_DATA = {
     "Cobra": {"class": "reptile", "diet": "carnivore", "enclosure": "tropical terrarium", "min_size": 20},
     "King Cobra": {"class": "reptile", "diet": "carnivore", "enclosure": "tropical terrarium", "min_size": 25},
@@ -52,6 +54,9 @@ REPTILE_DATA = {
     "Alligator": {"class": "reptile", "diet": "carnivore", "enclosure": "aquatic reptile", "min_size": 180},
     "Sea Turtle": {"class": "reptile", "diet": "herbivore", "enclosure": "aquatic reptile", "min_size": 150},
 }
+
+REPTILE_ENCLOSURES = list(set(info["enclosure"] for info in REPTILE_DATA.values()))
+
 
 BIRD_DATA = {
     "Eagle": {"class": "bird", "diet": "carnivore", "enclosure": "aviary", "min_size": 80},
@@ -73,3 +78,7 @@ BIRD_DATA = {
     "Canary": {"class": "bird", "diet": "herbivore", "enclosure": "aviary", "min_size": 10},
     "Finch": {"class": "bird", "diet": "herbivore", "enclosure": "aviary", "min_size": 10}
 }
+
+BIRD_ENCLOSURES = list(set(info["enclosure"] for info in BIRD_DATA.values()))
+
+ENCLOSURES = list(MAMMAL_ENCLOSURES+REPTILE_ENCLOSURES+BIRD_ENCLOSURES)

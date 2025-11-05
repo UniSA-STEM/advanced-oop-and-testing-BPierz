@@ -19,7 +19,7 @@ class Mammal(Animal):
             raise ValueError(f"Mammal: {species} not in database")
 
     def make_sound(self):
-        info = MAMMAL_DATA[self._species]
+        info = MAMMAL_DATA[self.species]
         sound = info.get("sound")
         print (f'{self.name}: "{sound}"\n')
 

@@ -44,7 +44,8 @@ class Entry:
          f"Issue: {self.__issue}\n"
          f"Details: {self.__details}\n"
          f"Severity: {self.str_severity()}\n"
-         f"Treatment: {self.__treatment}")
+         f"Treatment: {self.__treatment}\n"
+                f"---- END OF ENTRY ----\n")
 
     def __repr__(self):
         return (f"Date: {self.__date} | Issue: {self.__issue} | Severity: {self.str_severity()}\n")

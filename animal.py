@@ -15,31 +15,35 @@ class Animal(ABC):
 
     def __init__(self, name: str, species: str, age: int):
 
-        self.name = name
-        self._species = species
+        self.__name = name
+        self.__species = species
         self.__age = age
         self.__hunger = 0
         self.__thirst = 0
         self.__log = []
 
-
-
     def __str__(self):
-        return (f"Name: {self.name}\n"
-                f"Species: {self._species}\n"
+        return (f"Name: {self.__name}\n"
+                f"Species: {self.__species}\n"
                 f"Age: {self.__age}\n")
 
     def __repr__(self):
-        return (f"{self._species}: {self.name}\n")
+        return (f"{self.__name}: {self.__species}\n")
 
     def __eq__(self, other):
-        if self._species == other._species:
-            if self.name == other.name:
+        if self.__species == other.species:
+            if self.__name == other.name:
                 return True
 
     @property
     def log(self):
         return self.__log
+    @property
+    def name(self):
+        return self.__name
+    @property
+    def species(self):
+        return self.__species
 
     @abstractmethod
     def make_sound(self):
