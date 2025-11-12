@@ -40,7 +40,8 @@ class Entry:
 
 
     def __str__(self):
-        return (f"Date: {self.__date}\n"
+        return (f"---- ENTRY ----\n"
+                f"Date: {self.__date}\n"
          f"Issue: {self.__issue}\n"
          f"Details: {self.__details}\n"
          f"Severity: {self.str_severity()}\n"

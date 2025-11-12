@@ -6,8 +6,8 @@ ID: 110100110
 Username: bizvy001
 This is my own work as defined by the University's Academic Integrity Policy.'''
 
-from animal import Animal
-from zoo_data import BIRD_DATA
+from .animal import Animal
+from zoodata.zoo_data import BIRD_DATA
 
 class Bird(Animal):
     BIRDS = list(BIRD_DATA.keys())

@@ -7,11 +7,11 @@ Username: bizvy001
 This is my own work as defined by the University's Academic Integrity Policy.
 '''
 
-from animal import Animal
-from animal_mammal import Mammal
-from animal_bird import Bird
-from animal_reptile import Reptile
-from zoo_data import *
+from domain.animals.animal import Animal
+from domain.animals.animal_mammal import Mammal
+from domain.animals.animal_bird import Bird
+from domain.animals.animal_reptile import Reptile
+from zoodata.zoo_data import *
 
 class Enclosure:
     ENCLOSURES = ENCLOSURES
@@ -22,9 +22,10 @@ class Enclosure:
         self.__size = size
         if env_type not in ENCLOSURES:
             raise ValueError(f"Invalid enclosure type: {env_type}")
+
         self.__type = env_type
         self.__id_code = id_code
-        self.__cleanliness = 0
+        self.__cleanliness = 5
 
     def __eq__(self, other):
         if isinstance(other, Enclosure):
@@ -37,13 +38,15 @@ class Enclosure:
     @property
     def contains(self):
         return self.__contains
-
+    @property
+    def cleanliness(self):
+        return self.__cleanliness
 
     def __repr__(self):
         return f"Enclosure: {self.__id_code}"
 
     def report(self):
-        print(f"Cleanliness: /5\n"
+        print(f"Cleanliness: {self.__cleanliness}/5\n"
               f"Animals: {self.__contains}\n")
 
     def can_store(self, animal: Animal):
@@ -60,4 +63,8 @@ class Enclosure:
 
     def store(self, animal: Animal):
         self.__contains.append(animal)
+
+    def be_cleaned(self):
+        self.__cleanliness += 1
+
 

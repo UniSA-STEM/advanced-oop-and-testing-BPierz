@@ -18,9 +18,11 @@ class Animal(ABC):
         self.__name = name
         self.__species = species
         self.__age = age
-        self.__hunger = 0
-        self.__thirst = 0
+        self.__hungry = True
+        self.__thirsty = True
+        self.__asleep = False
         self.__log = []
+        self.__treatment = False
 
     def __str__(self):
         return (f"Name: {self.__name}\n"
@@ -28,7 +30,7 @@ class Animal(ABC):
                 f"Age: {self.__age}\n")
 
     def __repr__(self):
-        return (f"{self.__name}: {self.__species}\n")
+        return f"{self.__name}: {self.__species}\n"
 
     def __eq__(self, other):
         if self.__species == other.species:
@@ -44,20 +46,32 @@ class Animal(ABC):
     @property
     def species(self):
         return self.__species
+    @property
+    def hungry(self):
+        return self.__hungry
+    @property
+    def treatment(self):
+        return self.__treatment
+    @treatment.setter
+    def treatment(self, treatment: bool):
+        self.__treatment = treatment
+
 
     @abstractmethod
     def make_sound(self):
         pass
 
     def eat(self):
-        pass
+        self.__hungry = False
+        print (f"{self.__name} ate and is no longer hungry.")
 
     def drink(self):
-        pass
+        self.__thirsty = False
+        print (f"{self.__name} drank and is no longer thirsty.")
 
     def sleep(self):
-        pass
-
+        self.__asleep = True
+        print(f"{self.__name} has fallen asleep.")
 
     def add_log_entry(self, log_entry):
         self.__log.append(log_entry)
