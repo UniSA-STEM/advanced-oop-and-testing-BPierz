@@ -18,10 +18,10 @@ class Animal(ABC):
         self.__name = name
         self.__species = species
         self.__age = age
+        self.__in_enclosure = None
         self.__hungry = True
         self.__thirsty = True
         self.__asleep = False
-        self.__log = []
         self.__treatment = False
 
     def __str__(self):
@@ -52,6 +52,14 @@ class Animal(ABC):
     @property
     def treatment(self):
         return self.__treatment
+    @property
+    def in_enclosure(self):
+        return self.__in_enclosure
+    @in_enclosure.setter
+    def in_enclosure(self, in_enclosure):
+        self.__in_enclosure = in_enclosure
+
+
     @treatment.setter
     def treatment(self, treatment: bool):
         self.__treatment = treatment

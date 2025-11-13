@@ -34,3 +34,6 @@ class AnimalUnderTreatmentError(Exception):
 
 class NoSetAnimalError(Exception):
     pass
+
+class IncompleteTaskError(Exception):
+    pass

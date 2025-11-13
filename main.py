@@ -10,6 +10,7 @@ This is my own work as defined by the University's Academic Integrity Policy.
 from domain.animals.animal import Animal
 from system.zoo_system import ZooSystem
 from domain.animals.animal_mammal import Mammal
+from interface.interface import Interface
 
 # Creating Animal object of subclass Mammal
 #MotoMoto = Mammal("Moto Moto", "Hippopotamus", 5)
@@ -70,6 +71,10 @@ print(ZooSystem.staff)
 # Staff can feed a single animal if provided with Animal object (Any staff member has the ability to feed an animal)
 ZooSystem.staff[0].feed_animal(ZooSystem.animals[0]) # Vet feeding animal, not necessarily one they are currently working on
 ZooSystem.assign_enclosure_to_keeper("100Sav1", "NarUzu07")
+
+# Testing with ui approach
+ui = Interface(ZooSystem)
+ui.display_feeding_schedule()
 
 
 

@@ -28,8 +28,9 @@ class Staff:
 
         self.__birthday = birthday
         self.__id = id
-
         self.__role = None
+        self.__tasks = []
+
 
     @property
     def id(self):

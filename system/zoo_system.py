@@ -3,13 +3,14 @@ from domain.animals.animal import Animal
 from domain.animals.animal_mammal import Mammal
 from domain.animals.animal_bird import Bird
 from domain.animals.animal_reptile import Reptile
+from domain.records.cleaning_task import CleaningTask
 from domain.records.health_entry import Entry
 from domain.staff.staff import Staff
 from domain.staff.staff_keeper import Keeper
 from domain.staff.staff_veterinarian import Veterinarian
-from interface.interface import Interface
 from collections import defaultdict
 from exceptions import *
+from domain.records.feeding_task import FeedingTask
 
 class ZooSystem:
     ANIMAL_TYPES = ['Mammal', 'Bird', 'Reptile']
@@ -19,7 +20,12 @@ class ZooSystem:
         self.__enclosures = []
         self.__animals = []
         self.__staff = []
-        self.__health_log = defaultdict(dict)
+        self.__uncompleted_tasks = defaultdict(list)
+        self.__completed_tasks = defaultdict(dict)
+        self.__health_records = defaultdict(dict)
+        self.__feeding_schedule = defaultdict(dict)
+        self.__cleaning_schedule = defaultdict(dict)
+
 
     @property
     def log(self):
@@ -36,6 +42,10 @@ class ZooSystem:
     @property
     def enclosures(self):
         return self.__enclosures
+    @property
+    def uncompleted_tasks(self):
+        return self.__uncompleted_tasks
+
 
 # Method creates enclosure code for identification based on enclosure type and order in enclosure log
     def create_enclosure_code(self, type: str, size: int) -> str:
@@ -75,11 +85,18 @@ class ZooSystem:
         for i in self.__enclosures:
             if i.id == enclosure_id:
                 return i
+
+
 # Searches for staff owned by self based on id and returns Staff object
     def get_staff(self, staff_id: str):
         for i in self.__staff:
             if i.id == staff_id:
                 return i
+
+    def get_task(self, task_id: str):
+        for category, task in self.__uncompleted_tasks:
+            if task.id == task_id:
+                return task
 
 # Adds new enclosure object to own storage
     def add_enclosure(self, size: int, type: str):
@@ -146,6 +163,8 @@ class ZooSystem:
         if enclosure.can_store(animal):
             enclosure.store(animal)
 
+        animal.in_enclosure = enclosure.id
+
 # Assigns animals to veterinarians
     def assign_animal_to_vet(self, animal_name:str, staff_id: str):
         animal = self.get_animal(animal_name)
@@ -173,23 +192,56 @@ class ZooSystem:
             print(f"Animal is not in the zoo system")
 
         log_entry = Entry(date, issue, details, severity, treatment)
-        animal.add_log_entry(log_entry)
-        self.__health_log[animal.name][date] = log_entry
+        self.__health_records[animal.name][date] = log_entry
 
-    # Displays health log of health records.
-    def display_log(self, animal_name: str):
+    # Returns health record per animal
+    def get_health_record(self, animal_name: str):
+        animal_record = self.__health_records[animal_name]
+        return animal_record
 
-        print(f"---- {animal_name} Health Records ----")
-        for date, entry in self.__health_log[animal_name].items():
-            print(entry)
-        print(f"---- End of Health Records ----")
 
-    # Schedule feeding for staff
-    def to_feed(self):
-        need_feeding = [animal for animal in self.__animals if animal.hungry]
-        return need_feeding
+    # Schedule feeding across zoo for keeper staff
+    def schedule_feeding_auto(self):
+        feeding_schedule = {}
+        for enclosure in self.__enclosures:
+            hungry = [animal.name for animal in enclosure.contains if animal.hungry]
+            if hungry:
+                feeding_schedule[enclosure.id] = hungry
+                if len(hungry) == len(enclosure.contains):
+                    feeding_schedule[enclosure.id] = ["All Animals"]
+
+        feeding_tasks = []
+        for enclosure_id, animals in feeding_schedule.items():
+            task = FeedingTask(enclosure_id, animals)
+            feeding_tasks.append(task)
+
+        self.__uncompleted_tasks["Feeding"].extend(feeding_tasks)
+
 
     # Schedule cleaning for staff
-    def to_clean(self):
+    def schedule_cleaning_auto(self):
         need_cleaning = [enclosure for enclosure in self.__enclosures if enclosure.cleanliness < 3]
-        return need_cleaning
+        cleaning_tasks = []
+
+        for enclosure in need_cleaning:
+            cleaning_tasks.append(CleaningTask(enclosure.id))
+
+        self.__uncompleted_tasks["Cleaning"].extend(cleaning_tasks)
+
+    # Assign a task to staff member
+    def assign_task_to_staff(self, staff_id: str, task_id:str = None):
+        staff = self.get_staff(staff_id)
+        task = self.get_task(task_id)
+
+        if task.type == "Feeding" or "Cleaning" and staff.role != "Keeper":
+            raise InvalidStaffRoleError('Can only assign Keepers to Feedings and Cleanings')
+
+        staff.tasks.append(task)
+        task.assigned = True
+        task.assigned_to = staff_id
+
+    def get_staff_tasks (self, staff_id: str):
+        staff = self.get_staff(staff_id)
+        assigned_tasks = staff.tasks
+        return assigned_tasks
+
