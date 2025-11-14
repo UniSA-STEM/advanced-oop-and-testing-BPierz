@@ -20,16 +20,14 @@ class ZooSystem:
         self.__enclosures = []
         self.__animals = []
         self.__staff = []
-        self.__uncompleted_tasks = defaultdict(list)
-        self.__completed_tasks = defaultdict(dict)
+        self.__tasks_by_date = {}
+        self.__reported_issues = defaultdict(list)
         self.__health_records = defaultdict(dict)
-        self.__feeding_schedule = defaultdict(dict)
-        self.__cleaning_schedule = defaultdict(dict)
 
 
     @property
-    def log(self):
-        return self.__health_log
+    def health_records(self):
+        return self.__health_records
 
     @property
     def animals(self):
@@ -42,12 +40,12 @@ class ZooSystem:
     @property
     def enclosures(self):
         return self.__enclosures
+
     @property
-    def uncompleted_tasks(self):
-        return self.__uncompleted_tasks
+    def tasks_by_date(self):
+        return self.__tasks_by_date
 
-
-# Method creates enclosure code for identification based on enclosure type and order in enclosure log
+# Creates enclosure code for identification based on enclosure type and order in enclosure log
     def create_enclosure_code(self, type: str, size: int) -> str:
         index = type.find(' ')
         id_code = str(size)
@@ -78,25 +76,31 @@ class ZooSystem:
         for i in self.__animals:
             if i.name == animal_name:
                 return i
-        return None
+
+        raise NoSuchAnimalError('No such animal exists at the Zoo')
 
 # Searches for enclosures owned by self based on id and returns an Enclosure object
     def get_enclosure(self, enclosure_id: str):
+        lookup_id = str(enclosure_id).strip()
         for i in self.__enclosures:
-            if i.id == enclosure_id:
+            if i.id == lookup_id:
                 return i
-
+        raise NoSuchEnclosureError('No such enclosure exists at the Zoo')
 
 # Searches for staff owned by self based on id and returns Staff object
     def get_staff(self, staff_id: str):
-        for i in self.__staff:
-            if i.id == staff_id:
-                return i
+        lookup_id = str(staff_id).strip()
+        for staff in self.__staff:
+            if staff.id == lookup_id:
+                return staff
 
-    def get_task(self, task_id: str):
-        for category, task in self.__uncompleted_tasks:
-            if task.id == task_id:
-                return task
+        raise NoSuchStaffError('No such staff member exists at the Zoo')
+
+    def get_staff_id(self, staff_name: str):
+
+        for staff in self.__staff:
+            if staff.name == staff_name:
+                return staff.id
 
 # Adds new enclosure object to own storage
     def add_enclosure(self, size: int, type: str):
@@ -124,17 +128,14 @@ class ZooSystem:
 
         staff_id = self.create_staff_id(name, birthday)
 
-        if gender not in ['Male', 'Female']:
-            raise ValueError('Invalid staff gender')
-
         if role != None:
 
-            if role not in ['Keeper', 'Administrator', 'Veterinarian']:
-                raise ValueError('Invalid staff role')
+            if role.lower() not in ['keeper', 'administrator', 'veterinarian']:
+                raise ValueError('Invalid staff role (must be keeper, administrator, or veterinarian)')
 
-            if role == 'Keeper':
+            if role.lower() == 'keeper':
                 new_staff = Keeper(name, age, gender, birthday, staff_id)
-            if role == 'Veterinarian':
+            if role.lower() == 'veterinarian':
                 new_staff = Veterinarian(name, age, gender, birthday, staff_id)
 
         else:
@@ -142,16 +143,64 @@ class ZooSystem:
 
         self.__staff.append(new_staff)
 
+    def remove_staff(self, staff_id: str):
+        staff = self.get_staff(staff_id)  # will raise NoSuchStaffError if not found
+
+        # Role-specific checks
+        if staff.role == "Veterinarian" and staff.working_animal is not None:
+            raise CannotRemoveStaffError("Can not remove staff while staff is working on animals")
+
+        if staff.role == "Keeper" and staff.working_enclosure is not None:
+            raise CannotRemoveStaffError("Can not remove staff while staff is working on enclosure")
+
+        # Unassign all their tasks
+        for task in staff.tasks:
+            task.assigned = False
+            task.assigned_to = None
+        staff.tasks.clear()
+
+        # Finally remove staff from system
+        self.__staff.remove(staff)
+
+
+
 # removes enclosure from own enclosures
-    def remove_enclosure(self, enclosure: Enclosure):
+    def remove_enclosure(self, enclosure_id: str):
+
+        enclosure = self.get_enclosure(enclosure_id)
+        animals = enclosure.contains
+
+        if animals:
+            raise CannotRemoveEnclosureError('Can only remove Enclosures without animals currently stored')
+
+        keepers_id = enclosure.keepers
+        for id in keepers_id:
+            keeper = self.get_staff(id)
+            keeper.assigned_enclosures.remove(enclosure)
+            if keeper.working_enclosure == enclosure:
+                keeper.working_enclosure = None
+
         self.__enclosures.remove(enclosure)
 
 # Removes animal from own animals and deletes health information
     def remove_animal(self, animal_name: str):
         animal = self.get_animal(animal_name)
 
-        if animal_name in self.__health_log:
-            del self.__health_log[animal_name]
+        enclosure = animal.in_enclosure
+        vets = [staff for staff in self.__staff if staff.type == "Veterinarian"]
+
+        if animal.treatment == True:
+            raise CannotRemoveAnimalError('Can not remove animals in treatment')
+        if enclosure:
+            enclosure.contains.remove(animal)
+        if animal_name in self.__health_records:
+            del self.__health_records[animal_name]
+
+        for vet in vets:
+            if animal in vet.assigned_animals:
+                vet.assigned_animals.remove(animal)
+            if animal in vet.working_animal:
+                vet.working_animal = None
 
         self.__animals.remove(animal)
 
@@ -162,8 +211,12 @@ class ZooSystem:
 
         if enclosure.can_store(animal):
             enclosure.store(animal)
-
         animal.in_enclosure = enclosure.id
+
+    def get_enclosure_animals (self, enclosure_id: str):
+        enclosure = self.get_enclosure(enclosure_id)
+        animals = enclosure.contains
+        return animals
 
 # Assigns animals to veterinarians
     def assign_animal_to_vet(self, animal_name:str, staff_id: str):
@@ -183,8 +236,9 @@ class ZooSystem:
             raise InvalidStaffRoleError('Can only assign Keepers to Enclosures')
 
         keeper.accept_assignment(enclosure)
+        enclosure.keepers.append(keeper.id)
 
-    # Reports health issues
+    # Report health issues
     def report_issue(self, animal_name: str, date: str, issue: str, details: str, severity: int, treatment: str):
         animal = self.get_animal(animal_name)
 
@@ -194,14 +248,40 @@ class ZooSystem:
         log_entry = Entry(date, issue, details, severity, treatment)
         self.__health_records[animal.name][date] = log_entry
 
+
     # Returns health record per animal
     def get_health_record(self, animal_name: str):
         animal_record = self.__health_records[animal_name]
         return animal_record
 
+    def get_date_key(self, date: str = None):
+        return date if date is not None else "UNSCHEDULED"
 
-    # Schedule feeding across zoo for keeper staff
-    def schedule_feeding_auto(self):
+    def get_or_create_date_slot(self, date: str = None):
+        date_key = self.get_date_key(date)
+
+        if date_key not in self.__tasks_by_date:
+            self.__tasks_by_date[date_key] = {
+                "uncompleted": {},
+                "completed": {}
+            }
+        return self.__tasks_by_date[date_key]
+
+
+    def add_task(self, task, date: str = None, staff_id: str = None):
+
+        slot = self.get_or_create_date_slot(date)
+        bucket = slot["uncompleted"]
+
+        key = staff_id if staff_id is not None else "UNASSIGNED"
+
+        if key not in bucket:
+            bucket[key] = []
+
+        bucket[key].append(task)
+
+    def schedule_feeding_auto(self, date: str = None):
+
         feeding_schedule = {}
         for enclosure in self.__enclosures:
             hungry = [animal.name for animal in enclosure.contains if animal.hungry]
@@ -210,38 +290,179 @@ class ZooSystem:
                 if len(hungry) == len(enclosure.contains):
                     feeding_schedule[enclosure.id] = ["All Animals"]
 
-        feeding_tasks = []
+
+        date_key = self.get_date_key(date)
+        existing_ids = set()
+        if date_key in self.__tasks_by_date:
+            for bucket in self.__tasks_by_date[date_key]["uncompleted"].values():
+                for t in bucket:
+                    existing_ids.add(t.id)
+            for bucket in self.__tasks_by_date[date_key]["completed"].values():
+                for t in bucket:
+                    existing_ids.add(t.id)
+
         for enclosure_id, animals in feeding_schedule.items():
             task = FeedingTask(enclosure_id, animals)
-            feeding_tasks.append(task)
-
-        self.__uncompleted_tasks["Feeding"].extend(feeding_tasks)
+            if task.id not in existing_ids:
+                self.add_task(task, date=date)
 
 
     # Schedule cleaning for staff
-    def schedule_cleaning_auto(self):
+
+    def schedule_cleaning_auto(self, date: str = None):
         need_cleaning = [enclosure for enclosure in self.__enclosures if enclosure.cleanliness < 3]
-        cleaning_tasks = []
+
+        date_key = self.get_date_key(date)
+        existing_ids = set()
+        if date_key in self.__tasks_by_date:
+            for bucket in self.__tasks_by_date[date_key]["uncompleted"].values():
+                for t in bucket:
+                    existing_ids.add(t.id)
+            for bucket in self.__tasks_by_date[date_key]["completed"].values():
+                for t in bucket:
+                    existing_ids.add(t.id)
 
         for enclosure in need_cleaning:
-            cleaning_tasks.append(CleaningTask(enclosure.id))
+            task = CleaningTask(enclosure.id)
+            if task.id not in existing_ids:
+                self.add_task(task, date=date)
 
-        self.__uncompleted_tasks["Cleaning"].extend(cleaning_tasks)
-
-    # Assign a task to staff member
-    def assign_task_to_staff(self, staff_id: str, task_id:str = None):
+    def assign_task_to_staff(self, staff_id: str, task_id: str):
         staff = self.get_staff(staff_id)
-        task = self.get_task(task_id)
 
-        if task.type == "Feeding" or "Cleaning" and staff.role != "Keeper":
-            raise InvalidStaffRoleError('Can only assign Keepers to Feedings and Cleanings')
+        date_key, state, owner_id, task = self._find_task_in_schedule(task_id)
 
-        staff.tasks.append(task)
+
+        if state != "uncompleted":
+            raise InvalidTaskAssignmentError("Cannot assign a completed task.")
+
+        if task.type in ("Feeding", "Cleaning") and staff.role != "Keeper":
+            raise InvalidStaffRoleError("Can only assign Keepers to Feedings and Cleanings")
+
+        if task.type == "Treatment" and staff.role != "Veterinarian":
+            raise InvalidStaffRoleError("Can only assign Veterinarians to Treatments")
+
+
+        slot = self.__tasks_by_date[date_key]
+        uncompleted = slot["uncompleted"]
+
+
+        uncompleted[owner_id].remove(task)
+        if not uncompleted[owner_id]:
+            del uncompleted[owner_id]
+
+
+        if staff_id not in uncompleted:
+            uncompleted[staff_id] = []
+        uncompleted[staff_id].append(task)
+
+
         task.assigned = True
         task.assigned_to = staff_id
+        staff.tasks.append(task)
 
-    def get_staff_tasks (self, staff_id: str):
+    def get_all_tasks(self):
+
+        result = {
+            "uncompleted": [],
+            "completed": []
+        }
+
+        for date_key, slot in self.__tasks_by_date.items():
+            for staff_id, tasks in slot.get("uncompleted", {}).items():
+                result["uncompleted"].extend(tasks)
+
+            for staff_id, tasks in slot.get("completed", {}).items():
+                result["completed"].extend(tasks)
+
+        return result
+
+    def get_uncompleted_tasks(self):
+        return self.get_all_tasks()["uncompleted"]
+    def get_completed_tasks(self):
+        return self.get_all_tasks()["completed"]
+
+
+    def get_staff_tasks(self, staff_id: str):
         staff = self.get_staff(staff_id)
-        assigned_tasks = staff.tasks
-        return assigned_tasks
+
+        result = {}
+
+        for date_key, slot in self.__tasks_by_date.items():
+
+            staff_tasks = {
+                "uncompleted": slot.get("uncompleted", {}).get(staff_id, []),
+                "completed": slot.get("completed", {}).get(staff_id, [])
+            }
+
+            if staff_tasks["uncompleted"] or staff_tasks["completed"]:
+                result[date_key] = staff_tasks
+
+        return result
+
+    def get_date_tasks(self, date: str):
+
+        date_key = date if date is not None else "UNSCHEDULED"
+
+        slot = self.__tasks_by_date.get(date_key)
+        if slot is None:
+            raise NoSuchDateinScheduleError
+
+        return {
+            "uncompleted": dict(slot.get("uncompleted", {})),
+            "completed": dict(slot.get("completed", {})),
+        }
+
+    def get_unscheduled_tasks(self):
+
+        slot = self.__tasks_by_date.get("UNSCHEDULED")
+
+        if slot is None:
+            return {
+                "uncompleted": {},
+                "completed": {}
+            }
+
+        return {
+            "uncompleted": dict(slot.get("uncompleted", {})),
+            "completed": dict(slot.get("completed", {})),
+        }
+
+    def get_unassigned_tasks_for_date(self, date: str):
+
+        date_key = date if date is not None else "UNSCHEDULED"
+
+        slot = self.__tasks_by_date.get(date_key)
+        if slot is None:
+            return []
+
+        uncompleted = slot.get("uncompleted", {})
+        return uncompleted.get("UNASSIGNED", [])
+
+    def create_task_manual(self, task_type: str, enclosure_id: str = None, animal_names: list[str] = None):
+        normalised_type = task_type.capitalize()
+
+        existing_ids = {t.id for t in self.get_uncompleted_tasks()} | {t.id for t in self.get_completed_tasks()}
+        if normalised_type == "Feeding":
+            if enclosure_id is None or not animal_names:
+                raise IncompleteTaskError("Feeding task requires an enclosure ID and at least one animal name.")
+
+            task = FeedingTask(enclosure_id, animal_names)
+
+            if task.id not in existing_ids:
+                self.add_task(task, date=None)
+            return task
+
+        if normalised_type == "Cleaning":
+            if enclosure_id is None:
+                raise IncompleteTaskError("Cleaning task requires an enclosure ID.")
+
+            task = CleaningTask(enclosure_id)
+
+            if task.id not in existing_ids:
+                self.add_task(task, date=None)
+
+            return task
+
+        raise InvalidTaskTypeError(f"Unknown task type: {task_type}")
 

@@ -37,3 +37,39 @@ class NoSetAnimalError(Exception):
 
 class IncompleteTaskError(Exception):
     pass
+
+class CannotRemoveEnclosureError(Exception):
+    pass
+
+class CannotRemoveAnimalError(Exception):
+    pass
+
+class CannotRemoveStaffError(Exception):
+    pass
+
+class AnimalAlreadyAssignedError(Exception):
+    pass
+
+class NoSuchDateinScheduleError(Exception):
+    pass
+
+class InvalidTaskTypeError(Exception):
+    pass
+
+class TaskNotFoundError(Exception):
+    pass
+
+class NoSuchAnimalError(Exception):
+    pass
+
+class NoSuchEnclosureError(Exception):
+    pass
+
+class NoSuchStaffError(Exception):
+    pass
+
+class IncompatibleEnclosureError(Exception):
+    pass
+class DuplicateError(Exception):
+    pass
+

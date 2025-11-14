@@ -4,11 +4,11 @@ from exceptions import IncompleteTaskError
 
 class Task(ABC):
 
-    def __init__(self, task_type: str, enclosure_id: str | None = None, animal_id: str | None = None):
+    def __init__(self, task_type: str, enclosure_id: str = None, animal_id: str = None, date: str = None):
         self.__type = task_type
         self.__enclosure_id = enclosure_id
         self.__animal_id = animal_id
-
+        self.__date = date
         self.__assigned = False
         self.__assigned_to = None
         self.__complete = False
@@ -59,6 +59,13 @@ class Task(ABC):
     def complete(self):
         return self.__complete
 
+    @property
+    def date(self):
+        return self.__date
+    @date.setter
+    def date(self, value):
+        self.__date = value
+
     def mark_complete(self):
         self.__complete = True
 
@@ -68,6 +75,7 @@ class Task(ABC):
 
         return (
             "---- TASK ----\n"
+            f"Scheduled for: {self.__date}\n"
             f"ID: {self.__id}\n"
             f"Type: {self.__type}\n"
             f"{enc_line}{ani_line}"

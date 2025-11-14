@@ -17,7 +17,7 @@ class Reptile(Animal):
         super().__init__(name, species, age)
 
         if species not in self.REPTILES:
-            raise ValueError(f"Reptile: {species} not in database")
+            raise ValueError(f"{species} not in Reptile database")
 
 
     def make_sound(self):

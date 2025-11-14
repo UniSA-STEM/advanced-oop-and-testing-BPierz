@@ -1,80 +1,71 @@
-'''
-File: filename.py
-Description: A brief description of this Python module.
-Author: Billy Bizilis
-ID: 110100110
-Username: bizvy001
-This is my own work as defined by the University's Academic Integrity Policy.
-'''
-
-from domain.animals.animal import Animal
-from system.zoo_system import ZooSystem
-from domain.animals.animal_mammal import Mammal
 from interface.interface import Interface
+from system.zoo_system import ZooSystem
 
-# Creating Animal object of subclass Mammal
-#MotoMoto = Mammal("Moto Moto", "Hippopotamus", 5)
+system = ZooSystem("Sue's Zoo")
+ui = Interface(system)
 
-# Testing string conversion method
-#print(MotoMoto)
-# Testing mammal sound making method
-#MotoMoto.make_sound()
+ui.add_animal("Mammal", "MotoMoto", "Hippopotamus", 5)
+ui.add_animal("Bird", "Blue", "Macaw", 10)
+ui.add_animal("Mammal", "Mufasa", "Lion", 13)
+ui.add_animal("Mammal", "Melman", "Giraffe", 20)
+ui.add_animal("Reptile", "Sneaky", "Snake", 25)
 
-# Testing adding log entries
-# Creating Veterinarian
-#Alice = Veterinarian("Alice", 20, "Female", "02/04/2005")
+ui.remove_animal("Giraffe")
+ui.remove_animal("Melman")
 
-# Veterinarian reports issue on Animal object
-#Alice.report_issue(MotoMoto, "04/11/2025", "Is not eating", "MotoMoto has not touched his food for 2 days", 2, "Give appetite medication")
-#Alice.report_issue(MotoMoto, "29/12/2026", "Likes them big", "MotoMoto is overweight after appetite medication overdose", 1, "Reduce calories in diet")
+ui.add_staff("Peter Parker", 24, "Male", "12/20/2001", "Keeper")
 
-# Animal Object log updates
-#Alice.read_log(MotoMoto)
+ui.add_staff("Peter Griffin", 65, "Male", "05/03/1965", "Veterinarian")
 
-ZooSystem = ZooSystem("Simone's Zoo")
-ZooSystem.add_animal("Mammal", "MotoMoto", "Hippopotamus", 5)
-ZooSystem.report_issue("MotoMoto", "03/12/2024", "Is not eating", "Moto Moto has not touched his food in 2 days", 2, "Give medication")
-ZooSystem.report_issue("MotoMoto", "12/12/2024", "Now eats too much", "He is eating everything in sight", 3, "Somebody Stop HIM!")
-ZooSystem.add_animal("Bird", "Blue", "Macaw", 10)
-ZooSystem.report_issue("Blue", "15/12/2024", "Pecking at own feathers", "Blue is plucking himself, sign of boredom", 2, "Give him toys and a friend so he is not so bored")
+ui.add_staff("Mary Jane", 24, "Female", "05/12/2001", "Keeper")
 
-print(ZooSystem.log)
-print(ZooSystem.animals)
-ZooSystem.display_log("MotoMoto")
+ui.add_staff("Naruto Uzumaki", 18, "Male", "12/20/2006", "veterinarian")
 
-ZooSystem.remove_animal("Blue")
-print(ZooSystem.animals)
-ZooSystem.add_enclosure(100, "Savannah")
-print(ZooSystem.enclosures)
+ui.add_staff("Jonah Jameson", 70, "Male", "12/20/1960")
 
-# Testing assigning animals to enclosures
-ZooSystem.assign_animal_to_enclosure("MotoMoto", "100Sav1")
-print(ZooSystem.enclosures[0].contains)
+print(system.staff)
+for i in system.staff:
+    print(i.id)
 
-# Testing adding staff member and generating ID code
-ZooSystem.add_staff("Peter Parker",18, "Male",  "05/08/2008", "Veterinarian")
-print(ZooSystem.staff)
+ui.remove_staff("PetGri65")
 
-# Testing assigning veterinarian staff to animal
-ZooSystem.assign_animal_to_vet("MotoMoto", "PetPar08")
-print(ZooSystem.staff)
+print(system.staff)
 
-# Testing creating default staff
-ZooSystem.add_staff("Mary Jane",20, "Male",  "05/08/2006")
-print(ZooSystem.staff)
+ui.add_enclosure(100, "Savannah")
+ui.add_enclosure(50, "Forest")
+ui.add_enclosure(80, "Mountain")
+ui.add_enclosure(90, "Desert")
+ui.add_enclosure(75, "Riverbank")
+ui.add_enclosure(80, "Rainforest")
+ui.add_enclosure(100, "HumptyDumpty")
 
-# Testing adding a Keeper
-ZooSystem.add_staff("Naruto Uzumaki", 25, "Male", "05/08/2007", "Keeper")
-print(ZooSystem.staff)
 
-# Testing Animal and Staff interactions using real Animal objects stored inside ZooSystem
-# Staff can feed a single animal if provided with Animal object (Any staff member has the ability to feed an animal)
-ZooSystem.staff[0].feed_animal(ZooSystem.animals[0]) # Vet feeding animal, not necessarily one they are currently working on
-ZooSystem.assign_enclosure_to_keeper("100Sav1", "NarUzu07")
+ui.remove_enclosure("80Rai1")
+ui.remove_enclosure("Riverbank")
+ui.remove_enclosure("80Mou1")
 
-# Testing with ui approach
-ui = Interface(ZooSystem)
-ui.display_feeding_schedule()
+print(system.enclosures)
+
+ui.show_all_animals()
+ui.show_all_staff()
+ui.show_all_enclosures()
+
+ui.assign_animal_to_enclosure("MotoMoto", "75Riv1")
+ui.assign_animal_to_enclosure("Mufasa", "100Sav1")
+
+print(system.enclosures[0].contains )
+ui.show_all_enclosures()
+
+ui.assign_enclosure_to_keeper("100Sav1","PetPar01")
+ui.show_enclosure("100Sav1")
+
+ui.show_animal("Mufasa")
+ui.show_staff("NarUzu06")
+
+ui.assign_animal_to_vet("Mufasa", "NarUzu06")
+
+ui.show_staff("NarUzu06")
+
 
 
 

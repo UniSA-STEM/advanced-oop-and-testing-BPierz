@@ -11,13 +11,33 @@ class Keeper(Staff):
         self.__assigned_enclosures = []
         self.__working_enclosure = None
 
-    def __repr__(self):
-        super().__repr__()
-        return (f"Currently Working on: {self.__working_enclosure}"
-                f"Assigned enclosures: {self.__assigned_enclosures}")
+    def __str__(self):
+        if self.__working_enclosure is None:
+            working = "Nothing"
+        else:
+            working = self.__working_enclosure.name
+        base = super().__str__()
+        return f"{base} | Assigned Enclosures: {len(self.__assigned_enclosures)} | Currently Working: {working}"
 
+    @property
+    def assigned_enclosures(self):
+        return self.__assigned_enclosures
+
+    @assigned_enclosures.setter
+    def assigned_enclosures(self, assigned_enclosures):
+        self.__assigned_enclosures = assigned_enclosures
+
+    @property
+    def working_enclosure(self):
+        return self.__working_enclosure
+    @working_enclosure.setter
+    def working_enclosure(self, working_enclosure):
+        self.__working_enclosure = working_enclosure
 
     def accept_assignment (self, enclosure: Enclosure):
+        if enclosure in self.__assigned_enclosures:
+            raise DuplicateError (f"Enclosure {enclosure} already assigned to this Keeper")
+
         self.__assigned_enclosures.append(enclosure)
 
     def get_assigned_enclosure(self, enclosure_id: str):

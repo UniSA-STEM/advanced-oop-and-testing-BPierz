@@ -23,11 +23,25 @@ class Animal(ABC):
         self.__thirsty = True
         self.__asleep = False
         self.__treatment = False
+        self.__treated_by = None
 
     def __str__(self):
-        return (f"Name: {self.__name}\n"
+        if self.__in_enclosure == None:
+            enclosure = f"{self.__name} is currently not in an enclosure (temporary storage)!"
+        else:
+            enclosure = self.__in_enclosure
+        if self.__hungry == True or self.__treatment == True or self.__thirsty == True:
+            important = (f"{self.__name} needs attention (Possibly hungry or in treatment)")
+        else:
+            important = (f"{self.__name} is not in need of immediate attention)")
+
+        return (f"-----------------------\n"
+                f"Name: {self.__name}\n"
                 f"Species: {self.__species}\n"
-                f"Age: {self.__age}\n")
+                f"Age: {self.__age}\n"
+                f"In Enclosure: {enclosure}\n"
+                f"Important: {important}\n"
+                f"-----------------------\n")
 
     def __repr__(self):
         return f"{self.__name}: {self.__species}\n"
@@ -52,6 +66,9 @@ class Animal(ABC):
     @property
     def treatment(self):
         return self.__treatment
+    @property
+    def treated_by(self):
+        return self.__treated_by
     @property
     def in_enclosure(self):
         return self.__in_enclosure
