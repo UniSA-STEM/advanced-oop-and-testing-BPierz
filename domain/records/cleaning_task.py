@@ -10,6 +10,10 @@ class CleaningTask(Task):
         super().__init__(task_type="Cleaning", enclosure_id=enclosure_id, date=date)
 
     def _generate_id(self):
+        if self.date is None:
+            date = "UNS"
+            return f"Cln-{self.enclosure_id}-{date}"
+
         return f"Cln-{self.enclosure_id}-{self.date[:5]}"
 
     def _details_str(self):

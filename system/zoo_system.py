@@ -11,6 +11,7 @@ from domain.staff.staff_veterinarian import Veterinarian
 from collections import defaultdict
 from exceptions import *
 from domain.records.feeding_task import FeedingTask
+from datetime import datetime
 
 class ZooSystem:
     ANIMAL_TYPES = ['Mammal', 'Bird', 'Reptile']
@@ -125,7 +126,7 @@ class ZooSystem:
 
 # Adds new Staff object of subclass based on role attribute passed in
     def add_staff(self, name:str, age: int, gender:str, birthday:str, role = None):
-
+        date = self.validate_date(birthday)
         staff_id = self.create_staff_id(name, birthday)
 
         if role != None:
@@ -134,12 +135,12 @@ class ZooSystem:
                 raise ValueError('Invalid staff role (must be keeper, administrator, or veterinarian)')
 
             if role.lower() == 'keeper':
-                new_staff = Keeper(name, age, gender, birthday, staff_id)
+                new_staff = Keeper(name, age, gender, date, staff_id)
             if role.lower() == 'veterinarian':
-                new_staff = Veterinarian(name, age, gender, birthday, staff_id)
+                new_staff = Veterinarian(name, age, gender, date, staff_id)
 
         else:
-            new_staff = Staff(name, age, gender, birthday, staff_id)
+            new_staff = Staff(name, age, gender, date, staff_id)
 
         self.__staff.append(new_staff)
 
@@ -254,8 +255,17 @@ class ZooSystem:
         animal_record = self.__health_records[animal_name]
         return animal_record
 
+    def validate_date(self, date: str):
+        try:
+            dt = datetime.strptime(date, "%d/%m/%Y")
+        except ValueError:
+            raise InvalidDateError(f"Invalid date: '{date}'. Please use DD/MM/YYYY, e.g. 05/12/2025.")
+        return dt.strftime("%d/%m/%Y")
+
     def get_date_key(self, date: str = None):
-        return date if date is not None else "UNSCHEDULED"
+        if date is None:
+            return "UNSCHEDULED"
+        return self.validate_date(date)
 
     def get_or_create_date_slot(self, date: str = None):
         date_key = self.get_date_key(date)
@@ -272,12 +282,9 @@ class ZooSystem:
 
         slot = self.get_or_create_date_slot(date)
         bucket = slot["uncompleted"]
-
         key = staff_id if staff_id is not None else "UNASSIGNED"
-
         if key not in bucket:
             bucket[key] = []
-
         bucket[key].append(task)
 
     def schedule_feeding_auto(self, date: str = None):
@@ -290,7 +297,6 @@ class ZooSystem:
                 if len(hungry) == len(enclosure.contains):
                     feeding_schedule[enclosure.id] = ["All Animals"]
 
-
         date_key = self.get_date_key(date)
         existing_ids = set()
         if date_key in self.__tasks_by_date:
@@ -302,7 +308,7 @@ class ZooSystem:
                     existing_ids.add(t.id)
 
         for enclosure_id, animals in feeding_schedule.items():
-            task = FeedingTask(enclosure_id, animals)
+            task = FeedingTask(enclosure_id, animals, date_key)
             if task.id not in existing_ids:
                 self.add_task(task, date=date)
 
@@ -323,9 +329,10 @@ class ZooSystem:
                     existing_ids.add(t.id)
 
         for enclosure in need_cleaning:
-            task = CleaningTask(enclosure.id)
+            task = CleaningTask(enclosure.id, date_key)
             if task.id not in existing_ids:
                 self.add_task(task, date=date)
+
 
     def assign_task_to_staff(self, staff_id: str, task_id: str):
         staff = self.get_staff(staff_id)
@@ -361,108 +368,60 @@ class ZooSystem:
         task.assigned_to = staff_id
         staff.tasks.append(task)
 
-    def get_all_tasks(self):
+    def iter_tasks(self, date: str = None, status: str = None, assigned: bool = None, staff_id: str = None):
+        date_keys = [self.get_date_key(date)] if date else self.__tasks_by_date.keys()
 
-        result = {
-            "uncompleted": [],
-            "completed": []
-        }
+        for date in date_keys:
+            if date not in self.__tasks_by_date:
+                continue
+            buckets = self.__tasks_by_date[date]
 
-        for date_key, slot in self.__tasks_by_date.items():
-            for staff_id, tasks in slot.get("uncompleted", {}).items():
-                result["uncompleted"].extend(tasks)
+            status_keys = [status] if status else buckets.keys()
 
-            for staff_id, tasks in slot.get("completed", {}).items():
-                result["completed"].extend(tasks)
+            for status in status_keys:
+                for group, tasks in buckets[status].items():
+                    for task in tasks:
+                        if assigned is not None:
+                            is_assigned = task.assigned_to is not None
+                            if is_assigned != assigned:
+                                continue
+                        if staff_id is not None:
+                            if task.assigned_to != staff_id:
+                                continue
+                        yield date, status, group, task
 
-        return result
+    def task_exists(self, check_task, date: str = None):
+        for _, _, _, task in self.iter_tasks(date=date, status=None):
+            if task.id == check_task.id:
+                return True
+            return False
 
-    def get_uncompleted_tasks(self):
-        return self.get_all_tasks()["uncompleted"]
-    def get_completed_tasks(self):
-        return self.get_all_tasks()["completed"]
+    def get_task_by_id(self, task_id: str):
+        for _, _, _, task in self.iter_tasks():
+            if task.id == task_id:
+                return task
+        raise NoSuchTaskError(f"No task found with ID: {task_id}")
 
+    def create_task_manual(self, task_type: str, enclosure_id: str, animal_names: list, date: str = None):
 
-    def get_staff_tasks(self, staff_id: str):
-        staff = self.get_staff(staff_id)
-
-        result = {}
-
-        for date_key, slot in self.__tasks_by_date.items():
-
-            staff_tasks = {
-                "uncompleted": slot.get("uncompleted", {}).get(staff_id, []),
-                "completed": slot.get("completed", {}).get(staff_id, [])
-            }
-
-            if staff_tasks["uncompleted"] or staff_tasks["completed"]:
-                result[date_key] = staff_tasks
-
-        return result
-
-    def get_date_tasks(self, date: str):
-
-        date_key = date if date is not None else "UNSCHEDULED"
-
-        slot = self.__tasks_by_date.get(date_key)
-        if slot is None:
-            raise NoSuchDateinScheduleError
-
-        return {
-            "uncompleted": dict(slot.get("uncompleted", {})),
-            "completed": dict(slot.get("completed", {})),
-        }
-
-    def get_unscheduled_tasks(self):
-
-        slot = self.__tasks_by_date.get("UNSCHEDULED")
-
-        if slot is None:
-            return {
-                "uncompleted": {},
-                "completed": {}
-            }
-
-        return {
-            "uncompleted": dict(slot.get("uncompleted", {})),
-            "completed": dict(slot.get("completed", {})),
-        }
-
-    def get_unassigned_tasks_for_date(self, date: str):
-
-        date_key = date if date is not None else "UNSCHEDULED"
-
-        slot = self.__tasks_by_date.get(date_key)
-        if slot is None:
-            return []
-
-        uncompleted = slot.get("uncompleted", {})
-        return uncompleted.get("UNASSIGNED", [])
-
-    def create_task_manual(self, task_type: str, enclosure_id: str = None, animal_names: list[str] = None):
-        normalised_type = task_type.capitalize()
-
-        existing_ids = {t.id for t in self.get_uncompleted_tasks()} | {t.id for t in self.get_completed_tasks()}
+        normalised_type = task_type.strip().capitalize()
         if normalised_type == "Feeding":
             if enclosure_id is None or not animal_names:
-                raise IncompleteTaskError("Feeding task requires an enclosure ID and at least one animal name.")
+                raise IncompleteTaskError("Enclosure ID and Animal Names cannot be empty.")
+            new_task = FeedingTask(enclosure_id, animal_names, date)
 
-            task = FeedingTask(enclosure_id, animal_names)
-
-            if task.id not in existing_ids:
-                self.add_task(task, date=None)
-            return task
-
-        if normalised_type == "Cleaning":
+        elif normalised_type == "Cleaning":
             if enclosure_id is None:
-                raise IncompleteTaskError("Cleaning task requires an enclosure ID.")
+                raise IncompleteTaskError("Enclosure ID and Animal Names cannot be empty.")
+            new_task = CleaningTask(enclosure_id, date)
+        else:
+            raise IncompleteTaskError("Invalid task type.")
 
-            task = CleaningTask(enclosure_id)
+        if self.task_exists(new_task, date):
+            raise IncompleteTaskError("Task already exists.")
 
-            if task.id not in existing_ids:
-                self.add_task(task, date=None)
+        self.add_task(new_task, date=date)
+        return new_task
 
-            return task
 
-        raise InvalidTaskTypeError(f"Unknown task type: {task_type}")
 

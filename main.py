@@ -13,15 +13,15 @@ ui.add_animal("Reptile", "Sneaky", "Snake", 25)
 ui.remove_animal("Giraffe")
 ui.remove_animal("Melman")
 
-ui.add_staff("Peter Parker", 24, "Male", "12/20/2001", "Keeper")
+ui.add_staff("Peter Parker", 24, "Male", "12/01/2001", "Keeper")
 
 ui.add_staff("Peter Griffin", 65, "Male", "05/03/1965", "Veterinarian")
 
-ui.add_staff("Mary Jane", 24, "Female", "05/12/2001", "Keeper")
+ui.add_staff("Mary Jane", 24, "Female", "10/12/2001", "Keeper")
 
-ui.add_staff("Naruto Uzumaki", 18, "Male", "12/20/2006", "veterinarian")
+ui.add_staff("Naruto Uzumaki", 18, "Male", "15/9/2006", "veterinarian")
 
-ui.add_staff("Jonah Jameson", 70, "Male", "12/20/1960")
+ui.add_staff("Jonah Jameson", 70, "Male", "17/8/1960")
 
 print(system.staff)
 for i in system.staff:
@@ -66,6 +66,14 @@ ui.assign_animal_to_vet("Mufasa", "NarUzu06")
 
 ui.show_staff("NarUzu06")
 
+for enclosure in system.enclosures:
+    enclosure.cleanliness = 1
+
+ui.schedule_cleaning_auto("13/06/2025")
+ui.schedule_feeding_auto("15/06/2025")
+
+ui.add_enclosure(50, "Savannah")
+ui.create_task_manually("Cleaning", "50Sav2")
 
 
 

@@ -75,6 +75,14 @@ class Enclosure:
     def type(self):
         return self.__type
 
+    @property
+    def cleanliness(self):
+        return self.__cleanliness
+    @cleanliness.setter
+    def cleanliness(self, cleanliness):
+        self.__cleanliness = cleanliness
+
+
 
 
     def __repr__(self):

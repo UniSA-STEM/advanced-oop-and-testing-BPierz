@@ -70,6 +70,14 @@ class NoSuchStaffError(Exception):
 
 class IncompatibleEnclosureError(Exception):
     pass
+
 class DuplicateError(Exception):
     pass
+
+class InvalidDateError(Exception):
+    pass
+
+class NoSuchTaskError(Exception):
+    pass
+
 

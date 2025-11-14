@@ -1,6 +1,5 @@
 from domain import animals
-from exceptions import NoSuchAnimalError, NoSuchStaffError, NoSuchEnclosureError, IncompatibleEnclosureError, \
-    InvalidStaffRoleError, DuplicateError
+from exceptions import *
 from system.zoo_system import ZooSystem
 
 # This is the class made to output readable messages to console
@@ -31,6 +30,9 @@ class Interface:
             print (f"Staff Member cannot be added: {e}\n")
         except TypeError as e:
             print (f"Staff Member cannot be added: {e}\n")
+        except InvalidDateError as e:
+            print (f"Staff Member cannot be added: {e}\n")
+
 
     def remove_staff(self, staff_id: str):
         # Must have at least one identifier
@@ -126,7 +128,7 @@ class Interface:
     def show_staff(self, staff_id: str):
         try:
             staff = self.__system.get_staff(staff_id)
-            print(staff)
+            print(f"{staff}\n")
         except NoSuchStaffError as e:
             print(f"Cannot show staff: {e}\n")
 
@@ -185,66 +187,56 @@ class Interface:
             print(f"Cannot assign animal to Veterinarian: {e}\n")
 
 
+    def display_schedule(self, date: str = None, status: str = None, assigned:bool = None, staff_id:str = None):
+        tasks = list(self.__system.iter_tasks(date=date, status=status, assigned=assigned, staff_id=staff_id))
+        if not tasks:
+            print ("No tasks matching this selection can be found.\n")
+            return
 
-    def schedule_auto(self):
-        print (f"Creating automatic schedule based on Animal and Enclosure needs")
-        pass
+        current_date = None
+        current_status = None
 
-    def schedule_cleaning_auto(self):
-        print(f"Creating automatic cleaning based on Enclosure needs")
-        self.__system.schedule_cleaning_auto()
-
-        print(f"--- Cleaning Tasks ---\n")
-        print(self.__system.uncompleted_tasks["Cleaning"])
-
-    def schedule_feeding_auto(self):
-        print(f"Creating automatic feeding schedule based on Animal needs")
-
-        self.__system.schedule_feeding_auto()
-        print(f"--- Feeding Tasks ---\n")
-        print(self.__system.uncompleted_tasks["Feeding"])
-
-    def display_uncompleted_tasks(self):
-        print(f"Uncompleted Tasks\n")
-        print(self.__system.uncompleted_tasks)
+        for date, status, group, task in tasks:
+            if date != current_date:
+                current_date = date
+                print(f"=== Schedule for: {date} ===")
+            if status != current_status:
+                current_status = status
+                print(f"--- [{status.upper()}] ---\n")
+            print(f"{group}\n"
+                  f"{task}\n")
 
 
 
+    def schedule_cleaning_auto(self, date: str = None):
+        try:
+            self.__system.schedule_cleaning_auto(date)
+            print(f"Creating automatic cleaning schedule for {date} based on current Enclosure needs\n"
+                  f"Current Schedule for {date}: \n")
+
+            self.display_schedule(date=date, status=None, assigned=False)
+        except InvalidDateError as e:
+            print(f"Cannot schedule tasks: {e}\n")
+
+    def schedule_feeding_auto(self, date: str = None):
+        try:
+            self.__system.schedule_feeding_auto(date)
+            print(f"Creating automatic feeding schedule for {date} based on current Animal needs\n"
+                  f"Current Schedule for {date}: \n")
+
+            self.display_schedule(date=date, status=None, assigned=False)
+
+        except InvalidDateError as e:
+            print(f"Cannot schedule tasks: {e}\n")
 
 
+    def create_task_manually(self, task_type:str, enclosure_id = None, animal_names:list = None, date = None):
+        try:
+            new_task = self.__system.create_task_manual(task_type, enclosure_id, animal_names, date)
+            print (f"Task Created Successfully:\n {new_task}\n")
+        except IncompleteTaskError as e:
+            print(f"Cannot create task: {e}\n")
 
-
-
-
-
-
-
-
-
-    def display_staff(self, staff_role:str = None):
-        pass
-
-    def schedule_feeding_auto(self):
-        pass
-
-    def show_staff_tasks(self, staff_id:str = None, staff_name:str = None):
-        if staff_id is None:
-            staff_id = self.__system.get_staff_id(staff_name)
-
-        tasks = self.__system.get_staff_tasks(staff_id)
-        tasks_str = "\n".join(tasks)
-        print(f"Here is {staff_id}'s schedule:\n{tasks_str}")
-
-
-    def display_feeding_schedule(self):
-        tasks = self.__system.uncompleted_tasks["Feeding"]
-        tasks_str = "\n".join(tasks)
-        print(f"Here is the feeding schedule:\n{tasks_str}")
-
-    def display_cleaning_schedule(self):
-        tasks = self.__system.uncompleted_tasks["Cleaning"]
-        tasks_str = "\n".join(tasks)
-        print(f"Here is the cleaning schedule:\n{tasks_str}")
 
     def display_health_record(self, animal_name: str):
         print(f"---- {animal_name} Health Records ----")

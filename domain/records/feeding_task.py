@@ -14,6 +14,9 @@ class FeedingTask(Task):
 
     def _generate_id(self):
         count = len(self.__animals) if self.__animals is not None else 0
+        if self.date is None:
+            date = "UNS"
+            return f"Fd-{self.enclosure_id}-{count}-{date}"
         return f"Fd-{self.enclosure_id}-{count}-{self.date[:5]}"
 
 
