@@ -1,17 +1,44 @@
+'''
+File: veterinarian.py
+Description: This module defines the Veterinarian subclass used by the zoo system. The Veterinarian class
+             extends the Staff class and provides behaviours related to animal health, treatment tasks,
+             and medical care.
+Author: Borys Pierzchala
+ID: 110457330
+Username: PIEBY002
+This is my own work as defined by the University's Academic Integrity Policy.
+'''
+
 from domain.staff.staff import Staff
 from domain.animals.animal import Animal
 from domain.records.health_entry import Entry
 from exceptions import *
 
 class Veterinarian(Staff):
+    """ A subclass of Staff representing a veterinarian within the zoo system.
+        This class manages veterinarian-specific responsibilities, including
+        treating animals. """
 
     def __init__(self, name, age, gender, birthday, id):
+        """ Creates a Veterinarian object and initialises veterinarian-specific attributes.
+            Parameters:
+                - name: string
+                    The full name of the veterinarian.
+                - age: integer
+                    The age of the veterinarian in years.
+                - gender: string
+                    The gender of the veterinarian.
+                - birthday: string
+                    The date of birth of the veterinarian.
+                - id: string
+                    The unique identification code of the veterinarian."""
         super().__init__(name, age, gender, birthday, id)
         self.role = "Veterinarian"
         self.__assigned_animals = []
         self.__working_animal = None
 
     def __str__(self):
+        """ Returns a formatted string representation of the veterinarian object. """
         if self.__working_animal is None:
             working = "Nothing"
         else:
@@ -22,22 +49,36 @@ class Veterinarian(Staff):
 
     @property
     def assigned_animals(self):
+        """ Returns the list of animals assigned to this veterinarian. """
         return self.__assigned_animals
+
     @assigned_animals.setter
     def assigned_animals(self, assigned_animals):
+        """ Updates the list of animals assigned to this veterinarian. """
         self.__assigned_animals = assigned_animals
 
     @property
     def working_animal(self):
+        """ Returns the animal currently being treated by this veterinarian. """
         return self.__working_animal
+
     @working_animal.setter
     def working_animal(self, working_animal):
+        """ Updates the animal currently being treated by this veterinarian. """
         self.__working_animal = working_animal
 
     def accept_assignment(self, animal: Animal):
+        """ Assigns an animal to this veterinarian for potential treatment.
+            Parameters:
+                - animal: Animal
+                    The animal object being assigned."""
         self.__assigned_animals.append(animal)
 
     def get_assigned_animal(self, animal_name: str):
+        """ Retrieves an assigned animal based on its name.
+            Parameters:
+                - animal_name: string
+                    The name of the animal to retrieve."""
         if self.__assigned_animals == []:
             raise NoAssignedAnimalsError
 
@@ -47,6 +88,10 @@ class Veterinarian(Staff):
         return None
 
     def treat_animal(self, animal_name: str):
+        """ Begins treatment on an assigned animal and updates its medical state.
+            Parameters:
+                - animal_name: string
+                    The name of the animal to treat."""
         previous_animal = self.__working_animal
         if previous_animal != None:
             self.stop_working_animal(previous_animal)
@@ -65,6 +110,7 @@ class Veterinarian(Staff):
                 task.complete = True
 
     def stop_treating_animal(self):
+        """ Stops treatment on the current animal and resets its treatment state. """
         self.__working_animal.treatment = False
         self.__working_animal.treated_by = None
         self.__working_animal = None

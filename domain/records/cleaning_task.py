@@ -1,3 +1,15 @@
+'''
+File: cleaning_task.py
+Description: This module defines the CleaningTask subclass used by the zoo system. The CleaningTask class
+             extends the abstract Task class and represents enclosure-cleaning operations scheduled within
+             the zoo. It provides behaviour for generating task identifiers and formatting task details
+             specific to enclosure cleaning work.
+Author: Borys Pierzchala
+ID: 110457330
+Username: PIEBY002
+This is my own work as defined by the University's Academic Integrity Policy.
+'''
+
 from exceptions import IncompleteTaskError
 from domain.records.task import Task
 

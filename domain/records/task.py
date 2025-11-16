@@ -1,6 +1,19 @@
+'''
+File: tasks.py
+Description: This module defines the Task class and the task subclass hierarchy used by the zoo system.
+             The Task class is an abstract class and provides shared attributes and behaviours for all
+             scheduled tasks, including task identification, assignment fields, and completion status.
+             Subclasses extend this behaviour to represent specific operational tasks such as Feeding,
+             Cleaning, and Treatment. Task objects form the backbone of the schedulling functionality of the
+             zoo system.
+Author: Borys Pierzchala
+ID: 110457330
+Username: PIEBY002
+This is my own work as defined by the University's Academic Integrity Policy.
+'''
 
 from abc import ABC, abstractmethod
-from exceptions import IncompleteTaskError
+from exceptions import *
 
 class Task(ABC):
 

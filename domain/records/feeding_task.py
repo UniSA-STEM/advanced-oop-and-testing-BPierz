@@ -1,3 +1,15 @@
+'''
+File: feeding_task.py
+Description: This module defines the FeedingTask subclass used by the zoo system. The FeedingTask class
+             extends the abstract Task class and represents animal-feeding operations scheduled within
+             the zoo. It provides behaviour for generating task identifiers and formatting task details
+             specific to feeding work, including the list of animals assigned to the task.
+Author: Borys Pierzchala
+ID: 110457330
+Username: PIEBY002
+This is my own work as defined by the University's Academic Integrity Policy.
+'''
+
 from exceptions import IncompleteTaskError
 from domain.records.task import Task
 

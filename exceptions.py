@@ -1,3 +1,17 @@
+'''
+File: exceptions.py
+Description: This module defines the custom exception classes used by the zoo system. These exceptions
+             provide clear and specific error types for handling invalid operations, missing data, and
+             incorrect user input throughout the system. Each exception models a real operational error
+             scenario, allowing the zoo system and the Interface module to respond with meaningful and
+             user-friendly messages. This module supports robust error handling across all components of
+             the zoo system.
+Author: Borys Pierzchala
+ID: 110457330
+Username: PIEBY002
+This is my own work as defined by the University's Academic Integrity Policy.
+'''
+
 
 class AnimalAsleepError(Exception):
     pass
