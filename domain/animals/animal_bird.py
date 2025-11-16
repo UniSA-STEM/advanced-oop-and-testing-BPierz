@@ -10,15 +10,12 @@ This is my own work as defined by the University's Academic Integrity Policy.
 '''
 
 from .animal import Animal
-from zoodata.zoo_data import BIRD_DATA
 
 class Bird(Animal):
     """ A subclass of Animal representing avian species within the zoo system.
         This class validates bird species against predefined data and provides
         behaviour specific to bird objects. """
 
-    BIRDS = list(BIRD_DATA.keys())
-    DATA = BIRD_DATA
 
     def __init__(self, name: str, species: str, age: int):
         """ Creates a Bird object and validates that the species exists in the bird database.
@@ -31,11 +28,21 @@ class Bird(Animal):
                     The age of the bird object in years."""
         super().__init__(name, species, age)
 
-        if species not in self.BIRDS:
-            raise ValueError(f"Bird: {species} not in database")
 
     def make_sound(self):
         """ Produces the characteristic sound of the bird object using species data. """
         info = self.DATA[self.species]
         sound = info.get("sound")
         print (f'{self.name}: "{sound}"\n')
+
+    def eat(self):
+        """ Unique eat method that takes into account dietary needs of animal. """
+        diet = self.DATA[self.species]["diet"]
+        if diet == "carnivore":
+            food = "meat"
+        if diet == "herbivore":
+            food = "plants"
+        if diet == "omnivore":
+            food = "plants and meat"
+        self.__hungry = False
+        print (f"{self.__name} ate {food} is no longer hungry.")

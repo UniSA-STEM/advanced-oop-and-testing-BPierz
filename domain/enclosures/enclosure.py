@@ -18,8 +18,7 @@ class Enclosure:
         This class models real habitat structures that store animal objects and
         provides behaviours related to habitat type, size, cleanliness, assigned
         keepers, and the animals currently stored in the enclosure. """
-    ENCLOSURES = ENCLOSURES
-
+    ENCLOSURES = all_enclosures
 
     def __init__(self, size: int, env_type: str, id_code: str):
         """ Creates an Enclosure object and initialises enclosure attributes.
@@ -30,6 +29,7 @@ class Enclosure:
                     The environmental type of the enclosure.
                 - id_code: string
                     The unique enclosure identification code."""
+
         self.__contains = []
 
         if not isinstance(size, int):
@@ -40,7 +40,7 @@ class Enclosure:
         if not isinstance(env_type, str):
             raise TypeError("env_type must be an string representing an environment type")
 
-        if env_type not in ENCLOSURES:
+        if env_type not in self.ENCLOSURES:
             raise ValueError(f"Enviornment '{env_type}' cannot be found in data base")
 
 
@@ -52,6 +52,7 @@ class Enclosure:
     def __eq__(self, other):
         """ Returns a formatted string representation of the enclosure object. """
         animals = [animal.name for animal in self.__contains]
+
         if isinstance(other, Enclosure):
             return self.__id_code == other.id
         return False
@@ -59,9 +60,10 @@ class Enclosure:
     def __str__(self):
         """ Returns a formatted string representation of the enclosure object. """
         animals = [animal.name for animal in self.__contains]
-        if animals == []:
+        if not animals:
             animals_str = "Nothing"
-        animals_str = "\n ".join(animals)
+        else:
+            animals_str = "\n ".join(animals)
         keepers_str = ', '.join(self.keepers)
         return (f"-----------------------\n"
                 f"Enclosure ID: {self.__id_code}\n"
@@ -69,6 +71,10 @@ class Enclosure:
                 f"Contains: {animals_str}\n"
                 f"Keepers Assigned: {keepers_str}\n"
                 f"-----------------------\n")
+
+    def __repr__(self):
+        """ Returns a concise string representation of the enclosure object. """
+        return f"Enclosure: {self.__id_code}"
 
     @property
     def id(self):
@@ -98,14 +104,7 @@ class Enclosure:
     def type(self):
         """ Returns the type of the enclosure. """
         return self.__type
-    @property
 
-
-
-
-    def __repr__(self):
-        """ Returns a concise string representation of the enclosure object. """
-        return f"Enclosure: {self.__id_code}"
 
     def report(self):
         """ Prints a simple enclosure report including cleanliness and stored animals. """

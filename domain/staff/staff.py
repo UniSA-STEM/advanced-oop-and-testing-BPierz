@@ -22,19 +22,18 @@ class Staff:
             Subclasses extend this to model specific staff roles such as Keeper and Veterinarian"""
 
     def __init__(self, name: str, age: int, gender: str, birthday: str, id: str):
-        def __init__(self, name: str, age: int, gender: str, birthday: str, id: str):
-            """ Creates a Staff object and initialises shared staff attributes.
-                Parameters:
-                    - name: string
-                        The full name of the staff member.
-                    - age: integer
-                        The age of the staff member in years.
-                    - gender: string
-                        The gender of the staff member.
-                    - birthday: string
-                        The date of birth of the staff member.
-                    - id: string
-                        The unique identification code of the staff member."""
+        """ Creates a Staff object and initialises shared staff attributes.
+            Parameters:
+                - name: string
+                    The full name of the staff member.
+                - age: integer
+                    The age of the staff member in years.
+                - gender: string
+                    The gender of the staff member.
+                - birthday: string
+                    The date of birth of the staff member.
+                - id: string
+                    The unique identification code of the staff member."""
         self.__name = name
 
         if age < 0 or age > 120:

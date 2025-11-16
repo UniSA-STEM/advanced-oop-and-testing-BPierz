@@ -11,15 +11,12 @@ This is my own work as defined by the University's Academic Integrity Policy.
 
 
 from .animal import Animal
-from zoodata.zoo_data import REPTILE_DATA
+
 
 class Reptile(Animal):
     """ A subclass of Animal representing reptilian species within the zoo system.
         This class validates reptile species against predefined data and provides
         behaviours specific to reptiles. """
-
-    REPTILES = list(REPTILE_DATA.keys())
-    DATA = REPTILE_DATA
 
 
     def __init__(self, name: str, species: str, age: int):
@@ -33,12 +30,21 @@ class Reptile(Animal):
                     The age of the reptile object in years. """
         super().__init__(name, species, age)
 
-        if species not in self.REPTILES:
-            raise ValueError(f"{species} not in Reptile database")
-
 
     def make_sound(self):
         """ Produces the characteristic sound of the reptile object using species data. """
         info = self.DATA[self.species]
         sound = info.get("sound")
         print (f'{self.name}: "{sound}"\n')
+
+    def eat(self):
+        """ Unique eat method that takes into account dietary needs of animal. """
+        diet = self.DATA[self.species]["diet"]
+        if diet == "carnivore":
+            food = "meat"
+        if diet == "herbivore":
+            food = "plants"
+        if diet == "omnivore":
+            food = "plants and meat"
+        self.__hungry = False
+        print (f"{self.__name} ate {food} is no longer hungry.")

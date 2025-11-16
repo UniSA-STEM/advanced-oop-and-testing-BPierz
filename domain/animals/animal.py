@@ -12,12 +12,18 @@ This is my own work as defined by the University's Academic Integrity Policy.
 
 
 from abc import ABC, abstractmethod
+from zoodata.zoo_data import *
 
 
 class Animal(ABC):
     """ An abstract class representing a generic animal object within the zoo system.
            This class provides shared attributes and behaviours for all animals, including
            basic state information and core interactions such as eating, drinking, and sleeping. """
+
+    ANIMAL_DATA = animal_data
+    FOOD_ITEMS = all_food_items
+    ANIMALS = animals
+    ENCLOSURES = all_enclosures
 
     def __init__(self, name: str, species: str, age: int):
         """ Creates an Animal object and initialises shared animal attributes.
@@ -30,8 +36,25 @@ class Animal(ABC):
                             The age of the animal object in years."""
 
         self.__name = name
+
+        if species not in self.ANIMALS:
+            raise ValueError(f"{species} not in database")
         self.__species = species
         self.__age = age
+
+
+        found = False
+        for group in self.ANIMAL_DATA:
+            if species in group:
+                data = group[species]
+                self.__enclosure = data["enclosure"]
+                self.__diet = data["diet"]
+                found = True
+                break
+
+        if not found:
+            raise ValueError(f"{species} not found in animal data")
+
         self.__in_enclosure = None
         self.__hungry = True
         self.__thirsty = True
@@ -93,6 +116,15 @@ class Animal(ABC):
         """ Returns the ID of the Veterinarian treated by of the animal object. """
         return self.__treated_by
     @property
+    def enclosure(self):
+        """ Returns the ID of the Enclosure in which the animal object has to be stored in from database. """
+        return self.__enclosure
+    @property
+    def diet(self):
+        """ Returns a list of food items that the animal can eat from database. """
+        return self.__diet
+
+    @property
     def in_enclosure(self):
         """ Returns the ID of the Enclosure in which the animal object is currently in. """
         return self.__in_enclosure
@@ -113,8 +145,7 @@ class Animal(ABC):
 
     def eat(self):
         """ Allows the animal object to eat and updates its hunger state. """
-        self.__hungry = False
-        print (f"{self.__name} ate and is no longer hungry.")
+        pass
 
     def drink(self):
         """ Allows the animal object to drink and updates its thirst state. """
