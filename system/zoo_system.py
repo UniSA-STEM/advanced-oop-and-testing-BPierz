@@ -7,6 +7,7 @@ from domain.records.health_entry import Entry
 from domain.staff.staff import Staff
 from domain.staff.staff_keeper import Keeper
 from domain.staff.staff_veterinarian import Veterinarian
+from zoodata.zoo_data import *
 from collections import defaultdict
 from exceptions import *
 from domain.records.feeding_task import FeedingTask
@@ -15,6 +16,10 @@ from datetime import datetime
 
 class ZooSystem:
     ANIMAL_TYPES = ['Mammal', 'Bird', 'Reptile']
+    ANIMAL_DATA = animal_data
+    FOOD_ITEMS = all_food_items
+    ANIMALS = animals
+    ENCLOSURES = all_enclosures
 
     def __init__(self, zoo_name: str):
         """ Creates a ZooSystem object and initialises internal storage for all zoo data structures.
@@ -177,7 +182,7 @@ class ZooSystem:
         self.__enclosures.append(new_enclosure)
 
 
-    def add_animal(self, type: str, name: str, species: str, age: str):
+    def add_animal(self, type: str, name: str, species: str, age: int):
         """ A helper method used to create and store a new Animal object of appropriate subclass.
             Parameters:
                 - type: string
@@ -188,16 +193,48 @@ class ZooSystem:
                     The species of animal object.
                 - age: integer
                     The age of animal object in years """
+        norm_type = " ".join(type.strip().split()).title()
+        norm_species = " ".join(species.strip().split()).title()
 
-        if type not in self.ANIMAL_TYPES:
-            raise ValueError('Invalid animal type')
+        if norm_type not in self.ANIMAL_TYPES:
+            raise ValueError(f'Animal {type} not in database. Try Mammal, Reptile or Bird')
+        if norm_species not in self.ANIMALS:
+            raise ValueError(f'Animal {species} not in database. Add {species} to database manually or try again')
+        if not isinstance(age, int):
+            raise TypeError(f'Age must be a number')
+        if age <= 0:
+            raise ValueError(f'Age must be a positive number')
+
+        found = False
+        for group in self.ANIMAL_DATA:
+            if norm_species in group:
+                info = group[species]
+                found = True
+                break
+
+        if not found:
+            raise ValueError(f"{species} not found in animal data")
+        if age > info["max_age"]:
+            raise ValueError(f'{age} years of age for this species exceeds reasonable age of maximum {info["max_age"]} for this species.')
 
         if type == 'Mammal':
-            new_animal = Mammal(name, species, age)
+            enclosure = info["enclosure"]
+            diet = info["diet"]
+            sound = info["sound"]
+            new_animal = Mammal(name, species, age, enclosure, diet, sound)
+
         if type == 'Bird':
-            new_animal = Bird(name, species, age)
+            enclosure = info["enclosure"]
+            diet = info["diet"]
+            sound = info["sound"]
+
+            new_animal = Bird(name, species, age, enclosure, diet, sound)
         if type == 'Reptile':
-            new_animal = Reptile(name, species, age)
+            enclosure = info["enclosure"]
+            diet = info["diet"]
+            sound = info["sound"]
+            new_animal = Reptile(name, species, age, enclosure, diet, sound)
+
 
         self.__animals.append(new_animal)
 

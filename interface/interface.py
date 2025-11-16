@@ -357,7 +357,7 @@ class Interface:
                     The scheduled date for the task."""
         try:
             new_task = self.__system.create_task_manual(task_type, enclosure_id, animal_names, date)
-            print (f"Task Created Successfully:\n {new_task}\n")
+            print (f"Task Created Successfully!\n {new_task}\n")
         except IncompleteTaskError as e:
             print(f"Cannot create task: {e}\n")
 

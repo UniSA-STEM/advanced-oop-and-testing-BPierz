@@ -84,3 +84,11 @@ ui.schedule_feeding_auto("15/06/2025")
 # Creating Manual Tasks
 ui.add_enclosure(50, "Savannah")
 ui.create_task_manually("Cleaning", "50Sav2")
+
+animal1 = system.animals[0]
+animal2 = system.animals[1]
+animal3 = system.animals[2]
+
+animal1.make_sound()
+animal2.make_sound()
+animal3.make_sound()

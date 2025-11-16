@@ -37,7 +37,7 @@ class Staff:
         self.__name = name
 
         if age < 0 or age > 120:
-            raise ValueError("Age must be between 0 and 100")
+            raise ValueError("Age must be between 0 and 120")
         self.__age = age
 
         if gender.lower() not in ["male", "female"]:
@@ -97,14 +97,6 @@ class Staff:
         """ Returns a formatted string representation of this staff member, subclasses extend this __str__ method. """
         return f"ID: {self.__id} | Role: {self.__role}"
 
-    def feed_animal(self, animal: Animal):
-        """ Allows this staff member to feed an animal object and triggers the animal’s eat behaviour.
-            Parameters:
-                - animal: Animal
-                    The animal object being fed."""
-
-        print(f"{self.__name} is feeding {animal.name}")
-        animal.eat()
 
     def report_issue(self, date: str, summary: str, description: str):
         """ Creates a new issue report authored by this staff member.

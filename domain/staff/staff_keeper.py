@@ -10,6 +10,7 @@ This is my own work as defined by the University's Academic Integrity Policy.
 
 from domain.staff.staff import Staff
 from domain.enclosures.enclosure import Enclosure
+from domain.animals.animal import Animal
 from exceptions import *
 
 class Keeper(Staff):
@@ -43,7 +44,7 @@ class Keeper(Staff):
         if self.__working_enclosure is None:
             working = "Nothing"
         else:
-            working = self.__working_enclosure.name
+            working = self.__working_enclosure.id
         base = super().__str__()
         return f"{base} | Assigned Enclosures: {len(self.__assigned_enclosures)} | Currently Working: {working}"
 
@@ -108,10 +109,22 @@ class Keeper(Staff):
         """ Cleans the enclosure the keeper is currently working in. """
         self.__working_enclosure.be_cleaned()
 
-    def feed_animals(self):
-        """ Feeds all animals located in the enclosure the keeper is working in. """
-        print(f"{self.name} is feeding animals in {self.__working_enclosure}")
+    def feed_animals(self, food: str):
+        """Feeds all animals located in the enclosure the keeper is working in with the given food.
+           Each animal decides whether it can eat this food (diet, sleep state, etc.)."""
+        if self.__working_enclosure is None:
+            raise EnclosureNotAvailableError("Keeper is not currently working in an enclosure.")
+
+        print(f"{self.name} is feeding all animals in enclosure {self.__working_enclosure.id} with {food}")
+
         for animal in self.__working_enclosure.contains:
-            animal.eat()
+            try:
+                animal.eat(food)
+            except WrongFoodError as e:
+                # Animal rejects food (wrong diet, asleep, not hungry, etc.)
+                print(f"Could not feed {animal.name}: {e}")
 
-
+    def feed_animal(self, animal: Animal, food: str):
+        """Keeper attempts to feed a single animal with the given food."""
+        print(f"{self.name} attempts to feed {animal.name} with {food}")
+        animal.eat(food)

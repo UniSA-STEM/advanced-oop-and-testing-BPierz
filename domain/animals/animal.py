@@ -13,6 +13,7 @@ This is my own work as defined by the University's Academic Integrity Policy.
 
 from abc import ABC, abstractmethod
 from zoodata.zoo_data import *
+from exceptions import *
 
 
 class Animal(ABC):
@@ -25,7 +26,8 @@ class Animal(ABC):
     ANIMALS = animals
     ENCLOSURES = all_enclosures
 
-    def __init__(self, name: str, species: str, age: int):
+    @abstractmethod
+    def __init__(self, name: str, species: str, age: int, enclosure: str, diet: list, sound: str):
         """ Creates an Animal object and initialises shared animal attributes.
                     Parameters:
                         - name: string
@@ -36,24 +38,11 @@ class Animal(ABC):
                             The age of the animal object in years."""
 
         self.__name = name
-
-        if species not in self.ANIMALS:
-            raise ValueError(f"{species} not in database")
         self.__species = species
         self.__age = age
-
-
-        found = False
-        for group in self.ANIMAL_DATA:
-            if species in group:
-                data = group[species]
-                self.__enclosure = data["enclosure"]
-                self.__diet = data["diet"]
-                found = True
-                break
-
-        if not found:
-            raise ValueError(f"{species} not found in animal data")
+        self.__enclosure = enclosure
+        self.__diet = diet
+        self.__sound = sound
 
         self.__in_enclosure = None
         self.__hungry = True
@@ -132,23 +121,51 @@ class Animal(ABC):
     def in_enclosure(self, in_enclosure):
         """ Sets the ID of the Enclosure in which the animal object is currently in. """
         self.__in_enclosure = in_enclosure
+    @property
+    def asleep(self):
+        """ Returns True if the animal object is currently sleeping. """
+        return self.__asleep
+
 
     @treatment.setter
     def treatment(self, treatment: bool):
         """ Sets the treatement status of the animal. """
         self.__treatment = treatment
 
-    @abstractmethod
     def make_sound(self):
         """ Produces the characteristic sound of the animal object. """
-        pass
+        sound = self.__sound
+        print(f'{self.name}: "{sound}"\n')
 
-    def eat(self):
+    def can_eat(self, food: str):
+        """Returns True if the food passed in is contained in animal dietary requirements.
+            Parameters:
+                food: string
+                A string representing the food item being fed to animal"""
+        if self.__asleep == True:
+            raise AnimalAsleepError (f"{self.name} cannot eat as is currently sleeping.")
+
+        return food in self.__diet
+
+    def eat(self, food: str):
         """ Allows the animal object to eat and updates its hunger state. """
-        pass
+        if not self.can_eat(food):
+            raise WrongFoodError (f"Animal cannot eat {food}")
+        if self.__asleep == True:
+            raise AnimalAsleepError (f"{self.name} cannot eat as is currently sleeping.")
+
+        if not self.__hungry:
+            print(f"{self.name} is not hungry right now.")
+            return
+
+        self.__hungry = False
+        print(f"{self.name} the {self.species.title()} eats {food}.")
 
     def drink(self):
         """ Allows the animal object to drink and updates its thirst state. """
+        if self.__asleep == True:
+            raise AnimalAsleepError(f"{self.name} cannot eat as is currently sleeping.")
+
         self.__thirsty = False
         print (f"{self.__name} drank and is no longer thirsty.")
 

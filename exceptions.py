@@ -94,4 +94,12 @@ class InvalidDateError(Exception):
 class NoSuchTaskError(Exception):
     pass
 
+class InvalidTaskAssignmentError(Exception):
+    pass
+
+class WrongFoodError(Exception):
+    pass
+
+
+
 
