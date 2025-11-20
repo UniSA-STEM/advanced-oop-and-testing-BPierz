@@ -11,8 +11,6 @@ Username: PIEBY002
 This is my own work as defined by the University's Academic Integrity Policy.
 '''
 
-from domain.animals.animal import Animal
-from domain.records.issue import Issue
 
 
 class Staff:
@@ -36,11 +34,11 @@ class Staff:
                     The unique identification code of the staff member."""
         self.__name = name
 
-        if age < 0 or age > 120:
-            raise ValueError("Age must be between 0 and 120")
+        if age < 15 or age > 120:
+            raise ValueError("Age must be between 15 and 120")
         self.__age = age
 
-        if gender.lower() not in ["male", "female"]:
+        if gender.lower().strip() not in ["male", "female"]:
             raise ValueError("Gender must be 'male' or 'female'")
         self.__gender = gender
 
@@ -51,8 +49,6 @@ class Staff:
         self.__id = id
         self.__role = None
         self.__tasks = []
-        self.__reports = []
-
 
     @property
     def id(self):
@@ -96,18 +92,3 @@ class Staff:
     def __str__(self):
         """ Returns a formatted string representation of this staff member, subclasses extend this __str__ method. """
         return f"ID: {self.__id} | Role: {self.__role}"
-
-
-    def report_issue(self, date: str, summary: str, description: str):
-        """ Creates a new issue report authored by this staff member.
-            Parameters:
-                - date: string
-                    The date on which the issue is being reported.
-                - summary: string
-                    A short summary describing the issue.
-                - description: string
-                    A detailed description of the issue."""
-
-        new_issue = Issue(self.__name, date, summary, description)
-        self.__reports.append(new_issue)
-

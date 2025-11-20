@@ -44,12 +44,13 @@ class Animal(ABC):
         self.__diet = diet
         self.__sound = sound
 
-        self.__in_enclosure = None
+        self.__in_enclosure = None # stores enclosure ID string
+        self.__ailment = False
         self.__hungry = True
         self.__thirsty = True
         self.__asleep = False
         self.__treatment = False
-        self.__treated_by = None
+        self.__treated_by = None # Stores Staff ID of veterinarian treating
 
     def __str__(self):
         """ Returns a formatted string representation of the animal object."""
@@ -57,17 +58,33 @@ class Animal(ABC):
             enclosure = f"{self.__name} is currently not in an enclosure (temporary storage)!"
         else:
             enclosure = self.__in_enclosure
-        if self.__hungry == True or self.__treatment == True or self.__thirsty == True:
-            important = (f"{self.__name} needs attention (Possibly hungry or in treatment)")
-        else:
-            important = (f"{self.__name} is not in need of immediate attention)")
+
+        status = []
+        if self.__hungry:
+            status.append("hungry")
+        if self.__thirsty:
+            status.append("thirsty")
+        if self.__asleep:
+            status.append("sleeping")
+        if self.__ailment:
+            status.append("in need of medical attention")
+        if self.__treatment:
+            status.append(f"being treated by {self.__treated_by}")
+
+        if self.__ailment and not self.__treatment:
+            status.append("in need of medical attention and not in treatment!")
+
+        if not status:
+            status.append("Not in any need")
+
+        status_str = ", ".join(status) + "."
 
         return (f"-----------------------\n"
                 f"Name: {self.__name}\n"
                 f"Species: {self.__species}\n"
                 f"Age: {self.__age}\n"
                 f"In Enclosure: {enclosure}\n"
-                f"Important: {important}\n"
+                f"Status: {status_str}\n"
                 f"-----------------------\n")
 
     def __repr__(self):
@@ -104,6 +121,11 @@ class Animal(ABC):
     def treated_by(self):
         """ Returns the ID of the Veterinarian treated by of the animal object. """
         return self.__treated_by
+    @treated_by.setter
+    def treated_by(self, treated_by):
+        """ Sets the ID of the Veterinarian treating the animal object. """
+        self.__treated_by = treated_by
+
     @property
     def enclosure(self):
         """ Returns the ID of the Enclosure in which the animal object has to be stored in from database. """
@@ -125,6 +147,16 @@ class Animal(ABC):
     def asleep(self):
         """ Returns True if the animal object is currently sleeping. """
         return self.__asleep
+    @property
+    def ailment(self):
+        """ Returns Ailment status of the animal object. """
+        return self.__ailment
+    @ailment.setter
+    def ailment(self, ailment):
+        """ Sets the ailment status of the animal object. """
+        if not isinstance(ailment, bool):
+            raise TypeError (f"ailment: {ailment} must be a boolean")
+        self.__ailment = ailment
 
 
     @treatment.setter

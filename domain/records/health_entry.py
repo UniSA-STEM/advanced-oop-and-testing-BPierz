@@ -6,8 +6,11 @@ class Entry:
         self.__issue = issue
         self.__details = details
 
+        if not isinstance(severity, int):
+            raise TypeError("severity must be an integer")
+
         if severity < 0 or severity > 3:
-            raise ValueError
+            raise ValueError ("Please enter an integer severity of 0-3")
 
         self.__severity = severity
         self.__treatment = treatment

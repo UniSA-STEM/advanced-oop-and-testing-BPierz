@@ -9,8 +9,7 @@ Author: Borys Pierzchala
 ID: 110457330
 Username: PIEBY002
 This is my own work as defined by the University's Academic Integrity Policy.'''
-
-
+from domain.staff.staff import Staff
 from exceptions import *
 from system.zoo_system import ZooSystem
 
@@ -226,7 +225,7 @@ class Interface:
             else:
                 report = f"{len(enclosure.contains)} {animal.species}\n"
 
-            print(f"Animal now in Enclosure: {enclosure_id}\n"
+            print(f"Animal {animal.name} the {animal.species} now in Enclosure: {enclosure_id}\n"
                   f"Enclosure now contains: {report}")
 
         except NoSuchEnclosureError as e:
@@ -248,7 +247,7 @@ class Interface:
             keeper = self.__system.get_staff(keeper_id)
             enclosure = self.__system.get_enclosure(enclosure_id)
 
-            print(f"Keeper now responsible for Enclosure: {enclosure.id}\n")
+            print(f"Keeper {keeper.id} now responsible for Enclosure: {enclosure.id}\n")
 
         except NoSuchEnclosureError as e:
             print(f"Cannot assign keeper to enclosure: {e}\n")
@@ -270,7 +269,7 @@ class Interface:
             self.__system.assign_animal_to_vet(animal_name, vet_id)
             vet = self.__system.get_staff(vet_id)
             animal = self.__system.get_animal(animal_name)
-            print(f"Animal now Assigned to Veterinarian: {vet.id}\n")
+            print(f"{animal.name} the {animal.species} now Assigned to Veterinarian: {vet.id}\n")
 
         except NoSuchAnimalError as e:
             print(f"Cannot assign animal to Veterinarian: {e}\n")
@@ -299,18 +298,26 @@ class Interface:
             print ("No tasks matching this selection can be found.\n")
             return
 
+        if staff_id and not date and not status and assigned is None:
+            print(f"\n=== TASKS FOR STAFF: {staff_id} ===")
+
         current_date = None
         current_status = None
 
-        for date, status, group, task in tasks:
-            if date != current_date:
-                current_date = date
-                print(f"=== Schedule for: {date} ===")
-            if status != current_status:
-                current_status = status
-                print(f"--- [{status.upper()}] ---\n")
-            print(f"{group}\n"
-                  f"{task}\n")
+        for task_date, task_status, group, task in tasks:
+
+            if task_date != current_date:
+                current_date = task_date
+
+                if not (staff_id and not date and not status and assigned is None):
+                    print(f"\n=== Schedule for: {task_date} ===")
+                current_status = None
+
+            if task_status != current_status:
+                current_status = task_status
+                print(f"\n--- [{task_status.upper()}] ---")
+
+            print(f"\nAssigned to: {group}\n{task}")
 
 
 
@@ -321,10 +328,7 @@ class Interface:
                     The date for which cleaning tasks are to be created."""
         try:
             self.__system.schedule_cleaning_auto(date)
-            print(f"Creating automatic cleaning schedule for {date} based on current Enclosure needs\n"
-                  f"Current Schedule for {date}: \n")
-
-            self.display_schedule(date=date, status=None, assigned=False)
+            print(f"Created automatic cleaning schedule for {date} based on current Enclosure needs\n")
         except InvalidDateError as e:
             print(f"Cannot schedule tasks: {e}\n")
 
@@ -335,10 +339,7 @@ class Interface:
                     The date for which feeding tasks are to be created."""
         try:
             self.__system.schedule_feeding_auto(date)
-            print(f"Creating automatic feeding schedule for {date} based on current Animal needs\n"
-                  f"Current Schedule for {date}: \n")
-
-            self.display_schedule(date=date, status=None, assigned=False)
+            print(f"Created automatic feeding schedule for {date} based on current Animal needs\n")
 
         except InvalidDateError as e:
             print(f"Cannot schedule tasks: {e}\n")
@@ -361,9 +362,68 @@ class Interface:
         except IncompleteTaskError as e:
             print(f"Cannot create task: {e}\n")
 
+    def assign_task (self, staff_id, task_id):
+        """ Assigns task to staff
+            Parameters:
+                - staff_id: string (optional)
+                The staff id of the staff member to assign task to.
+                - task_id: string (optional)
+                The task id of the task that is to be assigned to staff.
+        """
+        try:
+            task = self.__system.get_task_by_id(task_id)
+            self.__system.assign_task_to_staff(staff_id, task_id)
+            print (f"Assigned task {task_id} to staff member {staff_id}\n")
+            print(task)
 
-    def display_health_record(self, animal_name: str):
-        print(f"---- {animal_name} Health Records ----")
-        print(f"{self.__system.get_health_record(animal_name)}")
-        print(f"---- End of Health Records ----")
+        except InvalidTaskAssignmentError as e:
+            print(f"Cannot assign task: {e}\n")
+        except InvalidStaffRoleError as e:
+            print(f"Cannot assign task: {e}\n")
+        except NoSuchStaffError as e:
+            print(f"Cannot assign task: {e}\n")
+        except NoSuchTaskError as e:
+            print(f"Cannot assign task: {e}\n")
+
+    def complete_task(self, staff_id, task_id):
+        """ Allows a task member to interact with the system and mark a task as complete."""
+
+        try:
+            self.__system.complete_task(task_id)
+            print(f"Task {task_id} completed successfully by {staff_id}.\n")
+
+        except IncompleteTaskError as e:
+            print(f"Cannot complete task: {e}\n")
+        except NoSuchTaskError as e:
+            print(f"Cannot complete task: {e}\n")
+
+    def create_health_entry(self, animal_name: str, date: str, issue: str, details: str, severity: int, treatment: str):
+
+        new_entry = self.__system.create_health_entry(animal_name, date, issue, details, severity, treatment)
+        print(f"\nHealth entry for {animal_name} created successfully!\n"
+              f"{new_entry}\n")
+
+
+    def display_health_record(self, animal_name: str = None, date: str = None):
+
+        if animal_name is None:
+            records = self.__system.health_records
+            print (records)
+
+            print(f"\n------ ZOO HEALTH RECORDS ------\n")
+            for key in records:
+                print(f"\n---- {key}'s Health Records ----\n")
+                for entry in records[key]:
+                    print (entry)
+
+            print(f"------ END OF HEALTH RECORDS ------\n")
+            return
+
+        animal_record = self.__system.get_animal_health_record(animal_name)
+
+        print(f"\n---- {animal_name}'s Health Records ----\n")
+        for entry in animal_record:
+            print(f"{entry}\n")
+
+        print(f"---- End of Health Records ----\n")
 

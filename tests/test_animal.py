@@ -1,6 +1,4 @@
 import pytest
-from pytest import *
-from domain.animals.animal import Animal
 from domain.animals.animal_mammal import Mammal
 from domain.animals.animal_bird import Bird
 from domain.animals.animal_reptile import Reptile

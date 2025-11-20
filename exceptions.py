@@ -64,7 +64,7 @@ class CannotRemoveStaffError(Exception):
 class AnimalAlreadyAssignedError(Exception):
     pass
 
-class NoSuchDateinScheduleError(Exception):
+class NoSuchDateInScheduleError(Exception):
     pass
 
 class InvalidTaskTypeError(Exception):
@@ -100,6 +100,6 @@ class InvalidTaskAssignmentError(Exception):
 class WrongFoodError(Exception):
     pass
 
-
-
+class AlreadyExistsError(Exception):
+    pass
 

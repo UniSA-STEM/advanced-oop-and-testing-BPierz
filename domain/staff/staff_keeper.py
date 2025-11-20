@@ -115,7 +115,7 @@ class Keeper(Staff):
         if self.__working_enclosure is None:
             raise EnclosureNotAvailableError("Keeper is not currently working in an enclosure.")
 
-        print(f"{self.name} is feeding all animals in enclosure {self.__working_enclosure.id} with {food}")
+        print(f"{self.name} fed all animals in enclosure {self.__working_enclosure.id} with {food}")
 
         for animal in self.__working_enclosure.contains:
             try:
@@ -126,5 +126,50 @@ class Keeper(Staff):
 
     def feed_animal(self, animal: Animal, food: str):
         """Keeper attempts to feed a single animal with the given food."""
-        print(f"{self.name} attempts to feed {animal.name} with {food}")
+        print(f"{self.name} fed {animal.name} with {food}")
         animal.eat(food)
+
+    def health_check(self, animal_name:str = None, enclosure_id:str = None):
+
+        if animal_name is None and enclosure_id is None:
+            found_any = False
+            for enclosure in self.__assigned_enclosures:
+                for animal in enclosure.contains:
+                    if animal.ailment:
+                        print(f"{self.id}: {animal.name} is in need of medical attention!")
+                        found_any = True
+            if not found_any:
+                print(f"No animals need medical attention!")
+
+        enclosures_to_check = self.__assigned_enclosures
+        if enclosure_id:
+            enclosures_to_check = [ e for e in self.__assigned_enclosures if e.id == enclosure_id ]
+            if not enclosures_to_check:
+                print(f"{self.id} is not assigned to enclosure {enclosure_id}.")
+            else:
+                enclosures_to_check = self.__assigned_enclosures
+
+        if animal_name:
+            for enclosure in self.__assigned_enclosures:
+                for animal in enclosure.contains:
+                    if animal.name == animal_name:
+                        if animal.ailment:
+                            print(f"{self.id}: {animal.name} is in need of medical attention!")
+                        else:
+                            print(f"{self.id}: {animal.name} is not in need of medical attention!")
+                        return
+            print (f"{animal_name} is not in keepers assigned enclosures.")
+
+        if enclosure_id:
+            enclosure = enclosures_to_check[0]
+            found_any = False
+            for animal in enclosure.contains:
+                if animal.ailment:
+                    print(f"{self.id}: {animal.name} is in need of medical attention!")
+                    found_any = True
+            if not found_any:
+                print("No animals in this enclosure need medical attention.")
+
+
+
+

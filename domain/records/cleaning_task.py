@@ -21,12 +21,8 @@ class CleaningTask(Task):
             raise IncompleteTaskError("No Enclosure provided for cleaning task")
         super().__init__(task_type="Cleaning", enclosure_id=enclosure_id, date=date)
 
-    def _generate_id(self):
+    def generate_id(self):
         if self.date is None:
             date = "UNS"
             return f"Cln-{self.enclosure_id}-{date}"
-
         return f"Cln-{self.enclosure_id}-{self.date[:5]}"
-
-    def _details_str(self):
-        return "Cleaning required\n"

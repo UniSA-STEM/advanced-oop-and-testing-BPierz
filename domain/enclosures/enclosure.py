@@ -35,6 +35,9 @@ class Enclosure:
         if not isinstance(size, int):
             raise TypeError("size must be an integer representing square meters")
 
+        if size < 0:
+            raise ValueError("size must be >= 0")
+
         self.__size = size
 
         if not isinstance(env_type, str):
@@ -49,13 +52,6 @@ class Enclosure:
         self.__cleanliness = 5
         self.__keepers = []
 
-    def __eq__(self, other):
-        """ Returns a formatted string representation of the enclosure object. """
-        animals = [animal.name for animal in self.__contains]
-
-        if isinstance(other, Enclosure):
-            return self.__id_code == other.id
-        return False
 
     def __str__(self):
         """ Returns a formatted string representation of the enclosure object. """
@@ -63,13 +59,20 @@ class Enclosure:
         if not animals:
             animals_str = "Nothing"
         else:
-            animals_str = "\n ".join(animals)
-        keepers_str = ', '.join(self.keepers)
+            animals_str = ", ".join(animals)
+        keepers = [keeper for keeper in self.__keepers]
+
+        if not keepers:
+            keepers_str = "None"
+        else:
+            keepers_str = ", ".join(keepers)
+
         return (f"-----------------------\n"
                 f"Enclosure ID: {self.__id_code}\n"
                 f"Type: {self.__type}\n"
                 f"Contains: {animals_str}\n"
                 f"Keepers Assigned: {keepers_str}\n"
+                f"Cleanliness: {self.__cleanliness}/5\n"
                 f"-----------------------\n")
 
     def __repr__(self):
@@ -91,7 +94,12 @@ class Enclosure:
     @cleanliness.setter
     def cleanliness(self, cleanliness):
         """ Sets the cleanliness value of the enclosure. """
+        if cleanliness <= 0:
+            cleanliness = 0
+        if cleanliness >= 5:
+            cleanliness = 5
         self.__cleanliness = cleanliness
+
     @property
     def keepers(self):
         """ Returns the keeper_ids assigned to the enclosure. """
@@ -104,7 +112,10 @@ class Enclosure:
     def type(self):
         """ Returns the type of the enclosure. """
         return self.__type
-
+    @property
+    def size(self):
+        """ Returns the size of the enclosure. """
+        return self.__size
 
     def report(self):
         """ Prints a simple enclosure report including cleanliness and stored animals. """

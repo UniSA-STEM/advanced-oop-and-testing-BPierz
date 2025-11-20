@@ -13,7 +13,6 @@ This is my own work as defined by the University's Academic Integrity Policy.
 '''
 
 from abc import ABC, abstractmethod
-from exceptions import *
 
 class Task(ABC):
 
@@ -21,20 +20,17 @@ class Task(ABC):
         self.__type = task_type
         self.__enclosure_id = enclosure_id
         self.__animal_id = animal_id
-        self.__date = date
+        self.__date = date if date is not None else "UNSCHEDULED"
         self.__assigned = False
         self.__assigned_to = None
         self.__complete = False
 
-        self.__id = self._generate_id()
+        self.__id = self.generate_id()
 
     @abstractmethod
-    def _generate_id(self) -> str:
+    def generate_id(self) -> str:
         pass
 
-    @abstractmethod
-    def _details_str(self) -> str:
-        pass
 
     @property
     def id(self):
@@ -85,6 +81,7 @@ class Task(ABC):
     def __str__(self):
         enc_line = f"Enclosure: {self.__enclosure_id}\n" if self.__enclosure_id else ""
         ani_line = f"Animal: {self.__animal_id}\n" if self.__animal_id else ""
+        comp_line = f"     COMPLETED     \n" if self.__complete else ""
 
         return (
             "---- TASK ----\n"
@@ -92,6 +89,6 @@ class Task(ABC):
             f"ID: {self.__id}\n"
             f"Type: {self.__type}\n"
             f"{enc_line}{ani_line}"
-            f"{self._details_str()}"
-            "--------------\n"
-        )
+            f"Assigned to: {self.__assigned_to}\n"
+            f"{comp_line}"
+            "--------------\n")

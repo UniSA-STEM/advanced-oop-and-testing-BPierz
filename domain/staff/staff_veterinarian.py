@@ -87,33 +87,66 @@ class Veterinarian(Staff):
                 return element
         return None
 
+
     def treat_animal(self, animal_name: str):
         """ Begins treatment on an assigned animal and updates its medical state.
             Parameters:
                 - animal_name: string
                     The name of the animal to treat."""
         previous_animal = self.__working_animal
+
         if previous_animal != None:
-            self.stop_working_animal(previous_animal)
+            self.stop_treating_animal(previous_animal)
 
         new_animal = self.get_assigned_animal(animal_name)
 
-        if new_animal is None: raise AnimalNotAvailableError(f"Animal is not in Vet Assigned Animals")
+        if new_animal is None:
+            raise AnimalNotAvailableError(f"Animal is not in Vet Assigned Animals")
 
         self.__working_animal = new_animal
 
         new_animal.treatment = True
-        self.__working_animal.treated_by = self.__id
+        self.__working_animal.treated_by = self.id
 
-        for task in self.tasks:
-            if task.animal_id == new_animal.id:
-                task.complete = True
+        print(f"{self.id} is treating {animal_name}.")
 
     def stop_treating_animal(self):
-        """ Stops treatment on the current animal and resets its treatment state. """
         self.__working_animal.treatment = False
         self.__working_animal.treated_by = None
-        self.__working_animal = None
+
+        if self.__working_animal.ailment:
+            print(f"{self.id} has stopped treating {self.__working_animal.name} but animal still in need of medical attention.")
+            self.__working_animal = None
+        else:
+            self.__working_animal = None
+
+    def heal_animal(self):
+        self.__working_animal.ailment = False
+        print(f"{self.id} has successfully treated {self.__working_animal.name}.")
+        self.stop_treating_animal()
+
+    def health_check(self, animal_name: str = None):
+
+        if animal_name is None:
+            for animal in self.__assigned_animals:
+                if animal.ailment:
+                    print(f"{self.id}: {animal.name} is in need of medical attention!")
+                else:
+                    print(f"{self.id}: {animal.name} is not in need of medical attention!")
+            return
+
+        for animal in self.__assigned_animals:
+            if animal_name == animal.name:
+                if animal.ailment:
+                    print(f"{self.id}: {animal.name} is in need of medical attention!")
+                else:
+                    print(f"{self.id}: {animal.name} is not in need of medical attention!")
+                return
+
+        print(f"{animal_name} is not assigned to {self.id}!")
+
+
+
 
 
 
