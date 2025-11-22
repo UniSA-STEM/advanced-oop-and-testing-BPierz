@@ -46,46 +46,46 @@ mammal_data = {
 mammal_enclosures = list(set(info["enclosure"] for info in mammal_data.values()))
 
 reptile_data = {
-    "Cobra": {"diet": ["mice", "rats", "frogs", "small birds"], "enclosure": "tropical terrarium", "sound": "hiss", "max_age": 20},
-    "King Cobra": {"diet": ["snakes", "lizards", "small mammals"], "enclosure": "tropical terrarium", "sound": "hiss", "max_age": 25},
-    "Python": {"diet": ["rats", "rabbits", "birds"], "enclosure": "tropical terrarium", "sound": "hiss", "max_age": 30},
-    "Boa Constrictor": {"diet": ["rats", "rabbits", "birds"], "enclosure": "tropical terrarium", "sound": "hiss", "max_age": 30},
-    "Anaconda": {"diet": ["fish", "birds", "small mammals"], "enclosure": "aquatic reptile", "sound": "hiss", "max_age": 30},
-    "Komodo Dragon": {"diet": ["meat", "carrion", "eggs"], "enclosure": "tropical terrarium", "sound": "growl", "max_age": 30},
-    "Monitor Lizard": {"diet": ["insects", "meat", "eggs"], "enclosure": "tropical terrarium", "sound": "hiss", "max_age": 20},
-    "Bearded Dragon": {"diet": ["insects", "greens", "vegetables"], "enclosure": "desert terrarium", "sound": "chirp", "max_age": 15},
-    "Iguana": {"diet": ["leafy greens", "fruit", "flowers"], "enclosure": "tropical terrarium", "sound": "rustle", "max_age": 20},
-    "Chameleon": {"diet": ["insects", "worms"], "enclosure": "tropical terrarium", "sound": "click", "max_age": 7},
-    "Gecko": {"diet": ["insects", "worms"], "enclosure": "desert terrarium", "sound": "chirp", "max_age": 15},
-    "Horned Viper": {"diet": ["mice", "lizards", "small birds"], "enclosure": "desert terrarium", "sound": "hiss", "max_age": 15},
-    "Desert Tortoise": {"diet": ["grass", "leafy greens", "flowers"], "enclosure": "desert terrarium", "sound": "rustle", "max_age": 60},
-    "Giant Tortoise": {"diet": ["leaves", "fruit", "vegetables"], "enclosure": "tropical terrarium", "sound": "grunt", "max_age": 120},
-    "Crocodile": {"diet": ["fish", "meat", "birds"], "enclosure": "aquatic reptile", "sound": "bellow", "max_age": 70},
-    "Alligator": {"diet": ["fish", "small mammals", "birds"], "enclosure": "aquatic reptile", "sound": "bellow", "max_age": 60},
-    "Sea Turtle": {"diet": ["sea grass", "algae"], "enclosure": "aquatic reptile", "sound": "splash", "max_age": 80}
+    "Cobra": {"diet": ["mice", "rats", "frogs", "small birds"], "enclosure": "Tropical Terrarium", "sound": "hiss", "max_age": 20},
+    "King Cobra": {"diet": ["snakes", "lizards", "small mammals"], "enclosure": "Tropical Terrarium", "sound": "hiss", "max_age": 25},
+    "Python": {"diet": ["rats", "rabbits", "birds"], "enclosure": "Tropical Terrarium", "sound": "hiss", "max_age": 30},
+    "Boa Constrictor": {"diet": ["rats", "rabbits", "birds"], "enclosure": "Tropical Terrarium", "sound": "hiss", "max_age": 30},
+    "Anaconda": {"diet": ["fish", "birds", "small mammals"], "enclosure": "Aquatic Reptile", "sound": "hiss", "max_age": 30},
+    "Komodo Dragon": {"diet": ["meat", "carrion", "eggs"], "enclosure": "Tropical Terrarium", "sound": "growl", "max_age": 30},
+    "Monitor Lizard": {"diet": ["insects", "meat", "eggs"], "enclosure": "Tropical Terrarium", "sound": "hiss", "max_age": 20},
+    "Bearded Dragon": {"diet": ["insects", "greens", "vegetables"], "enclosure": "Desert Terrarium", "sound": "chirp", "max_age": 15},
+    "Iguana": {"diet": ["leafy greens", "fruit", "flowers"], "enclosure": "Tropical Terrarium", "sound": "rustle", "max_age": 20},
+    "Chameleon": {"diet": ["insects", "worms"], "enclosure": "Tropical Terrarium", "sound": "click", "max_age": 7},
+    "Gecko": {"diet": ["insects", "worms"], "enclosure": "Desert Terrarium", "sound": "chirp", "max_age": 15},
+    "Horned Viper": {"diet": ["mice", "lizards", "small birds"], "enclosure": "Desert Terrarium", "sound": "hiss", "max_age": 15},
+    "Desert Tortoise": {"diet": ["grass", "leafy greens", "flowers"], "enclosure": "Desert Terrarium", "sound": "rustle", "max_age": 60},
+    "Giant Tortoise": {"diet": ["leaves", "fruit", "vegetables"], "enclosure": "Tropical Terrarium", "sound": "grunt", "max_age": 120},
+    "Crocodile": {"diet": ["fish", "meat", "birds"], "enclosure": "Aquatic Reptile", "sound": "bellow", "max_age": 70},
+    "Alligator": {"diet": ["fish", "small mammals", "birds"], "enclosure": "Aquatic Reptile", "sound": "bellow", "max_age": 60},
+    "Sea Turtle": {"diet": ["sea grass", "algae"], "enclosure": "Aquatic Reptile", "sound": "splash", "max_age": 80}
 }
 
 reptile_enclosures = list(set(info["enclosure"] for info in reptile_data.values()))
 
 bird_data = {
-    "Eagle": {"diet": ["fish", "rodents", "small birds"], "enclosure": "aviary", "sound": "screech", "max_age": 30},
-    "Hawk": {"diet": ["rodents", "small birds", "insects"], "enclosure": "aviary", "sound": "kree", "max_age": 25},
-    "Owl": {"diet": ["rodents", "insects", "small birds"], "enclosure": "aviary", "sound": "hoot", "max_age": 25},
-    "Falcon": {"diet": ["small birds", "insects", "rodents"], "enclosure": "aviary", "sound": "kek-kek", "max_age": 25},
-    "Vulture": {"diet": ["carrion", "meat"], "enclosure": "aviary", "sound": "hiss", "max_age": 40},
-    "Macaw": {"diet": ["nuts", "fruit", "seeds"], "enclosure": "tropical aviary", "sound": "squawk", "max_age": 60},
-    "Cockatoo": {"diet": ["seeds", "fruit", "nuts"], "enclosure": "tropical aviary", "sound": "screech", "max_age": 60},
-    "Toucan": {"diet": ["fruit", "insects"], "enclosure": "tropical aviary", "sound": "croak", "max_age": 20},
-    "Flamingo": {"diet": ["shrimp", "algae", "insects"], "enclosure": "waterfowl aviary", "sound": "honk", "max_age": 40},
-    "Pelican": {"diet": ["fish"], "enclosure": "waterfowl aviary", "sound": "grunt", "max_age": 30},
-    "Duck": {"diet": ["insects", "water plants", "seeds"], "enclosure": "waterfowl aviary", "sound": "quack", "max_age": 15},
-    "Swan": {"diet": ["water plants", "grass"], "enclosure": "waterfowl aviary", "sound": "honk", "max_age": 30},
-    "Penguin": {"diet": ["fish", "krill"], "enclosure": "waterfowl aviary", "sound": "bray", "max_age": 25},
-    "Peacock": {"diet": ["seeds", "insects"], "enclosure": "aviary", "sound": "mee-ow", "max_age": 20},
-    "Cane": {"diet": ["insects", "small fish", "plants"], "enclosure": "waterfowl aviary", "sound": "trumpet", "max_age": 30},
-    "Stork": {"diet": ["fish", "insects", "amphibians"], "enclosure": "waterfowl aviary", "sound": "clatter", "max_age": 30},
-    "Canary": {"diet": ["seeds", "fruit"], "enclosure": "aviary", "sound": "tweet", "max_age": 10},
-    "Finch": {"diet": ["seeds", "small insects"], "enclosure": "aviary", "sound": "cheep", "max_age": 10}
+    "Eagle": {"diet": ["fish", "rodents", "small birds"], "enclosure": "Aviary", "sound": "screech", "max_age": 30},
+    "Hawk": {"diet": ["rodents", "small birds", "insects"], "enclosure": "Aviary", "sound": "kree", "max_age": 25},
+    "Owl": {"diet": ["rodents", "insects", "small birds"], "enclosure": "Aviary", "sound": "hoot", "max_age": 25},
+    "Falcon": {"diet": ["small birds", "insects", "rodents"], "enclosure": "Aviary", "sound": "kek-kek", "max_age": 25},
+    "Vulture": {"diet": ["carrion", "meat"], "enclosure": "Aviary", "sound": "hiss", "max_age": 40},
+    "Macaw": {"diet": ["nuts", "fruit", "seeds"], "enclosure": "Tropical Aviary", "sound": "squawk", "max_age": 60},
+    "Cockatoo": {"diet": ["seeds", "fruit", "nuts"], "enclosure": "Tropical Aviary", "sound": "screech", "max_age": 60},
+    "Toucan": {"diet": ["fruit", "insects"], "enclosure": "Tropical Aviary", "sound": "croak", "max_age": 20},
+    "Flamingo": {"diet": ["shrimp", "algae", "insects"], "enclosure": "Waterfowl Aviary", "sound": "honk", "max_age": 40},
+    "Pelican": {"diet": ["fish"], "enclosure": "Waterfowl Aviary", "sound": "grunt", "max_age": 30},
+    "Duck": {"diet": ["insects", "water plants", "seeds"], "enclosure": "Waterfowl Aviary", "sound": "quack", "max_age": 15},
+    "Swan": {"diet": ["water plants", "grass"], "enclosure": "Waterfowl Aviary", "sound": "honk", "max_age": 30},
+    "Penguin": {"diet": ["fish", "krill"], "enclosure": "Waterfowl Aviary", "sound": "bray", "max_age": 25},
+    "Peacock": {"diet": ["seeds", "insects"], "enclosure": "Aviary", "sound": "mee-ow", "max_age": 20},
+    "Cane": {"diet": ["insects", "small fish", "plants"], "enclosure": "Waterfowl Aviary", "sound": "trumpet", "max_age": 30},
+    "Stork": {"diet": ["fish", "insects", "amphibians"], "enclosure": "Waterfowl Aviary", "sound": "clatter", "max_age": 30},
+    "Canary": {"diet": ["seeds", "fruit"], "enclosure": "Aviary", "sound": "tweet", "max_age": 10},
+    "Finch": {"diet": ["seeds", "small insects"], "enclosure": "Aviary", "sound": "cheep", "max_age": 10}
 }
 
 bird_enclosures = list(set(info["enclosure"] for info in bird_data.values()))

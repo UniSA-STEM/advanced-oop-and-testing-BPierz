@@ -82,9 +82,9 @@ class Veterinarian(Staff):
         if self.__assigned_animals == []:
             raise NoAssignedAnimalsError
 
-        for element in self.__assigned_animals:
-            if animal_name == element.name:
-                return element
+        for animal in self.__assigned_animals:
+            if animal_name == animal.name:
+                return animal
         return None
 
 
@@ -95,13 +95,14 @@ class Veterinarian(Staff):
                     The name of the animal to treat."""
         previous_animal = self.__working_animal
 
-        if previous_animal != None:
-            self.stop_treating_animal(previous_animal)
-
         new_animal = self.get_assigned_animal(animal_name)
 
         if new_animal is None:
             raise AnimalNotAvailableError(f"Animal is not in Vet Assigned Animals")
+        if not new_animal.ailment:
+            raise AnimalHealthyError (f"Animal doesn't require treatment at the moment")
+        if previous_animal != None:
+            self.stop_treating_animal()
 
         self.__working_animal = new_animal
 
@@ -118,6 +119,7 @@ class Veterinarian(Staff):
             print(f"{self.id} has stopped treating {self.__working_animal.name} but animal still in need of medical attention.")
             self.__working_animal = None
         else:
+            print(f"{self.id} has stopped treating {self.__working_animal.name}")
             self.__working_animal = None
 
     def heal_animal(self):
@@ -144,15 +146,5 @@ class Veterinarian(Staff):
                 return
 
         print(f"{animal_name} is not assigned to {self.id}!")
-
-
-
-
-
-
-    def report_issue(self, animal_name: str,  date: str, issue: str, details: str, severity: int, treatment: str):
-        log_entry = Entry(date, issue, details, severity, treatment)
-        animal = self.get_assigned_animal(animal_name)
-
 
 

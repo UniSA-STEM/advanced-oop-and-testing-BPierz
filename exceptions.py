@@ -103,3 +103,8 @@ class WrongFoodError(Exception):
 class AlreadyExistsError(Exception):
     pass
 
+class AnimalHealthyError(Exception):
+    pass
+
+class NotInDatabaseError(Exception):
+    pass

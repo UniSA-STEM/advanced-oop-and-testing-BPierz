@@ -143,11 +143,10 @@ class Keeper(Staff):
 
         enclosures_to_check = self.__assigned_enclosures
         if enclosure_id:
-            enclosures_to_check = [ e for e in self.__assigned_enclosures if e.id == enclosure_id ]
+            enclosures_to_check = [e for e in self.__assigned_enclosures if e.id == enclosure_id]
             if not enclosures_to_check:
                 print(f"{self.id} is not assigned to enclosure {enclosure_id}.")
-            else:
-                enclosures_to_check = self.__assigned_enclosures
+                return
 
         if animal_name:
             for enclosure in self.__assigned_enclosures:

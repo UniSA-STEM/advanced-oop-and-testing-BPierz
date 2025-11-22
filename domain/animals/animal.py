@@ -44,13 +44,13 @@ class Animal(ABC):
         self.__diet = diet
         self.__sound = sound
 
-        self.__in_enclosure = None # stores enclosure ID string
+        self.__in_enclosure = None
         self.__ailment = False
         self.__hungry = True
         self.__thirsty = True
         self.__asleep = False
         self.__treatment = False
-        self.__treated_by = None # Stores Staff ID of veterinarian treating
+        self.__treated_by = None
 
     def __str__(self):
         """ Returns a formatted string representation of the animal object."""
@@ -97,10 +97,6 @@ class Animal(ABC):
             if self.__name == other.name:
                 return True
 
-    @property
-    def log(self):
-        """ Returns the internal log data for this animal object. """
-        return self.__log
     @property
     def name(self):
         """ Returns the name of the animal object. """
@@ -157,12 +153,20 @@ class Animal(ABC):
         if not isinstance(ailment, bool):
             raise TypeError (f"ailment: {ailment} must be a boolean")
         self.__ailment = ailment
-
-
     @treatment.setter
     def treatment(self, treatment: bool):
         """ Sets the treatement status of the animal. """
         self.__treatment = treatment
+    @property
+    def age(self):
+        """ Returns the age of the animal object. """
+        return self.__age
+    @property
+    def enclosure(self):
+        """ Returns the ID of the Enclosure in which the animal object can be stored. """
+        return self.__enclosure
+
+
 
     def make_sound(self):
         """ Produces the characteristic sound of the animal object. """
@@ -183,7 +187,7 @@ class Animal(ABC):
         """ Allows the animal object to eat and updates its hunger state. """
         if not self.can_eat(food):
             raise WrongFoodError (f"Animal cannot eat {food}")
-        if self.__asleep == True:
+        if self.__asleep:
             raise AnimalAsleepError (f"{self.name} cannot eat as is currently sleeping.")
 
         if not self.__hungry:
@@ -195,7 +199,7 @@ class Animal(ABC):
 
     def drink(self):
         """ Allows the animal object to drink and updates its thirst state. """
-        if self.__asleep == True:
+        if self.__asleep:
             raise AnimalAsleepError(f"{self.name} cannot eat as is currently sleeping.")
 
         self.__thirsty = False
@@ -206,6 +210,5 @@ class Animal(ABC):
         self.__asleep = True
         print(f"{self.__name} has fallen asleep.")
 
-    def add_log_entry(self, log_entry):
-        self.__log.append(log_entry)
+
 

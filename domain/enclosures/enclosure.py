@@ -129,6 +129,8 @@ class Enclosure:
                             The animal object being checked against enclosure conditions.
                     Returns:
                         - True: if the enclosure can store the animal."""
+        if not isinstance(animal, Animal):
+            raise TypeError("animal must be an animal object")
 
         if animal.enclosure.lower() != self.__type.lower():
            raise IncompatibleEnclosureError ("animal needs different enclosure type")

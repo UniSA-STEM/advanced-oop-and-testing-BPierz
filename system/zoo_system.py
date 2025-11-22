@@ -1,3 +1,4 @@
+from domain.animals.animal import Animal
 from domain.enclosures.enclosure import Enclosure
 from domain.animals.animal_mammal import Mammal
 from domain.animals.animal_bird import Bird
@@ -105,11 +106,21 @@ class ZooSystem:
             Returns:
                 - staff_id: string
                     The unique staff id for staff member object. """
+        words = staff_name.split()
+        if len(words) <= 1:
+            raise ValueError ("Full name of staff member is required")
 
-        index = staff_name.find(' ')
-        staff_id = staff_name[:3]
-        staff_id += staff_name[index + 1:index + 4]
-        staff_id += staff_birthday[-2:]
+        first  = words[0]
+        if len(words) == 2:
+            last = words[1]
+            code = first[:3]+last[:3]
+        else:
+            middle = words[1]
+            last = words[-1]
+            code = first[:3]+middle[:1]+last[:2]
+
+        staff_id = f"{code}{staff_birthday[-2:]}"
+
         return staff_id
 
 
@@ -121,6 +132,8 @@ class ZooSystem:
             Returns:
                 - animal: Animal
                     The Animal object matching the provided animal name. """
+        if not isinstance(animal_name, str):
+            raise TypeError("Animal name must be a string")
 
         for i in self.__animals:
             if i.name == animal_name:
@@ -137,6 +150,8 @@ class ZooSystem:
             Returns:
                 - enclosure: Enclosure
                     The Enclosure object matching the provided enclosure id. """
+        if not isinstance(enclosure_id, str):
+            raise TypeError("Enclosure ID must be a string")
 
         lookup_id = str(enclosure_id).strip()
         for i in self.__enclosures:
@@ -153,26 +168,15 @@ class ZooSystem:
             Returns:
                 - staff: Staff
                     The Staff object matching the provided staff id. """
+        if not isinstance(staff_id, str):
+            raise TypeError("Staff ID must be a string")
+
         lookup_id = str(staff_id).strip()
         for staff in self.__staff:
             if staff.id == lookup_id:
                 return staff
 
         raise NoSuchStaffError('No such staff member exists at the Zoo')
-
-    def get_staff_id(self, staff_name: str):
-        """ A helper method used to retrieve the staff id of a staff member based on staff name string.
-            Parameters:
-                - staff_name: string
-                    The full name of staff member object to be looked up.
-            Returns:
-                - staff_id: string
-                    The unique staff id for staff member object matching the provided name. """
-
-        for staff in self.__staff:
-            if staff.name == staff_name:
-                return staff.id
-
 
     def add_enclosure(self, size: int, type: str):
         """ A helper method used to create and store a new Enclosure object in system storage.
@@ -181,6 +185,14 @@ class ZooSystem:
                     The size of enclosure object in square meters.
                 - type: string
                     The environmental type of enclosure object."""
+
+        if not isinstance(size, int) or not isinstance(type, str):
+            raise TypeError("Enclosure size must be a integer and type a string")
+        norm_type = type.strip().title()
+
+        if norm_type not in self.ENCLOSURES:
+            raise NotInDatabaseError('No such enclosure exists at the Zoo')
+
 
         id_code = self.create_enclosure_code(type, size)
         new_enclosure = Enclosure(size, type, id_code)
@@ -198,43 +210,53 @@ class ZooSystem:
                     The species of animal object.
                 - age: integer
                     The age of animal object in years """
+
+        if not isinstance(type, str) or not isinstance(species, str) or not isinstance(name, str):
+            raise TypeError("Species, name and type must be a string")
+
         norm_type = " ".join(type.strip().split()).title()
         norm_species = " ".join(species.strip().split()).title()
 
         if norm_type not in self.ANIMAL_TYPES:
-            raise ValueError(f'Animal {type} not in database. Try Mammal, Reptile or Bird')
+            raise NotInDatabaseError(f'Animal {type} not in database. Try Mammal, Reptile or Bird')
         if norm_species not in self.ANIMALS:
-            raise ValueError(f'Animal {species} not in database. Add {species} to database manually or try again')
+            raise NotInDatabaseError(f'Animal {species} not in database. Add {species} to database manually or try again')
         if not isinstance(age, int):
             raise TypeError(f'Age must be a number')
-        if age <= 0:
-            raise ValueError(f'Age must be a positive number')
+        if age < 0:
+            raise ValueError(f'Age must be a positive number or 0 if newborn')
+        if not isinstance(species, str) or not isinstance(name, str) or not isinstance(type, str):
+            raise TypeError("Species, name and type must be a string")
 
         found = False
         for group in self.ANIMAL_DATA:
             if norm_species in group:
-                info = group[species]
+                info = group[norm_species]
                 found = True
                 break
 
         if not found:
-            raise ValueError(f"{species} not found in animal data")
+            raise NotInDatabaseError(f'Animal {species} not in database. Add {species} to database manually or try again')
         if age > info["max_age"]:
             raise ValueError(f'{age} years of age for this species exceeds reasonable age of maximum {info["max_age"]} for this species.')
 
-        if type == 'Mammal':
+        for animal in self.__animals:
+            if animal.name == name:
+                raise DuplicateError(f"An Animal with this name already exists at the zoo, please choose another name.")
+
+        if norm_type == 'Mammal':
             enclosure = info["enclosure"]
             diet = info["diet"]
             sound = info["sound"]
             new_animal = Mammal(name, species, age, enclosure, diet, sound)
 
-        if type == 'Bird':
+        if norm_type == 'Bird':
             enclosure = info["enclosure"]
             diet = info["diet"]
             sound = info["sound"]
-
             new_animal = Bird(name, species, age, enclosure, diet, sound)
-        if type == 'Reptile':
+
+        if norm_type == 'Reptile':
             enclosure = info["enclosure"]
             diet = info["diet"]
             sound = info["sound"]
@@ -256,22 +278,33 @@ class ZooSystem:
                 - birthday: string
                     The birthday date of staff member object in string format.
                 - role: string (optional)
-                    The staff role indicating subclass (e.g. 'keeper', 'administrator', 'veterinarian')."""
+                    The staff role indicating subclass ('keeper', 'veterinarian')."""
+
+        if not isinstance(name, str) or not isinstance(gender, str) or not isinstance(birthday, str):
+            raise TypeError("Name, gender and birthday must be a string")
+        if not isinstance (age, int):
+            raise TypeError("Age must be a number")
+
+        name = name.strip()
+        if " " not in name:
+            raise ValueError(f"Staff name and surname (full name), separated by a space are required")
 
         date = self.validate_date(birthday)
         staff_id = self.create_staff_id(name, birthday)
+
+
         for staff in self.__staff:
 
             if staff.id == staff_id:
                 if staff.name == name and staff.birthday == birthday:
-                    raise AlreadyExistsError(f"Staff {name} with birthday {birthday} already in the system")
+                    raise DuplicateError(f"Staff {name} with birthday {birthday} already in the system")
                 else:
                     staff_id = "2" + staff.id
 
         if role != None:
 
             if role.lower().strip() not in ['keeper', 'veterinarian']:
-                raise ValueError('Invalid staff role (must be keeper or veterinarian)')
+                raise InvalidStaffRoleError('Invalid staff role (must be keeper or veterinarian)')
 
             if role.lower().strip() == 'keeper':
                 new_staff = Keeper(name, age, gender, date, staff_id)
@@ -289,19 +322,36 @@ class ZooSystem:
                 - staff_id: string
                     The unique staff id of staff member object to be removed."""
 
+        if not isinstance(staff_id, str):
+            raise TypeError("Staff Id must be a string")
+
         staff = self.get_staff(staff_id)
 
         if staff.role == "Veterinarian" and staff.working_animal is not None:
-            raise CannotRemoveStaffError("Can not remove staff while staff is working on animals")
+            raise CannotRemoveStaffError("Can not remove staff while staff is working on an animal")
 
         if staff.role == "Keeper" and staff.working_enclosure is not None:
-            raise CannotRemoveStaffError("Can not remove staff while staff is working on enclosure")
+            raise CannotRemoveStaffError("Can not remove staff while staff is working in enclosure")
 
-        for task in staff.tasks:
-            task.assigned = False
-            task.assigned_to = None
-        staff.tasks.clear()
+        for enclosure in self.__enclosures:
+            if staff_id in enclosure.keepers:
+                enclosure.keepers.remove(staff_id)
 
+        for date, buckets in self.__tasks_by_date.items():
+            for status, groups in buckets.items():
+
+                if staff_id in groups:
+
+                    unassigned = groups.setdefault("UNASSIGNED", [])
+
+                    for task in groups[staff_id]:
+                        task.assigned = False
+                        task.assigned_to = None
+                        unassigned.append(task)
+
+                    del groups[staff_id]
+
+                    break
         self.__staff.remove(staff)
 
 
@@ -310,6 +360,9 @@ class ZooSystem:
                Parameters:
                    - enclosure_id: string
                        The unique enclosure id of enclosure object to be removed."""
+
+        if not isinstance(enclosure_id, str):
+            raise TypeError("Enclosure ID must be a string")
 
         enclosure = self.get_enclosure(enclosure_id)
         animals = enclosure.contains
@@ -320,11 +373,23 @@ class ZooSystem:
         keepers_id = enclosure.keepers
         for id in keepers_id:
             keeper = self.get_staff(id)
-            keeper.assigned_enclosures.remove(enclosure)
+            if enclosure in keeper.assigned_enclosures:
+                keeper.assigned_enclosures.remove(enclosure)
             if keeper.working_enclosure == enclosure:
                 keeper.working_enclosure = None
 
+        for animal in self.__animals:
+            if animal.in_enclosure == enclosure_id:
+                animal.in_enclosure = None
+
+        for date, bucket in self.__tasks_by_date.items():
+            for state in ("uncompleted", "completed"):
+                groups = bucket[state]
+                for staff_id, tasks in list(groups.items()):
+                    groups[staff_id] = [t for t in tasks if not getattr(t, "enclosure_id", None) == enclosure_id]
+
         self.__enclosures.remove(enclosure)
+
 
     def remove_animal(self, animal_name: str):
         """ Used to remove an Animal object from system storage based on animal name string.
@@ -334,21 +399,50 @@ class ZooSystem:
 
         animal = self.get_animal(animal_name)
 
-        enclosure = animal.in_enclosure
-        vets = [staff for staff in self.__staff if staff.type == "Veterinarian"]
+        if not isinstance(animal_name, str):
+            raise TypeError("Animal name must be a string")
 
         if animal.treatment == True:
             raise CannotRemoveAnimalError('Can not remove animals in treatment')
-        if enclosure:
-            enclosure.contains.remove(animal)
-        if animal_name in self.__health_records:
-            del self.__health_records[animal_name]
 
-        for vet in vets:
-            if animal in vet.assigned_animals:
-                vet.assigned_animals.remove(animal)
-            if animal in vet.working_animal:
-                vet.working_animal = None
+        for date_key, buckets in self.__tasks_by_date.items():
+            for status in ("uncompleted", "completed"):
+                groups = buckets[status]
+                for owner_id, tasks in list(groups.items()):
+                    new_tasks = []
+                    for task in tasks:
+                        if isinstance(task, TreatmentTask) and task.animal_id == animal_name:
+                            continue
+
+                        if isinstance(task, FeedingTask) and isinstance(task.animals, list):
+                            if animal_name in task.animals:
+                                task.animals = [n for n in task.animals if n != animal_name]
+                                if not task.animals:
+                                    continue
+                        new_tasks.append(task)
+
+                    if new_tasks:
+                        groups[owner_id] = new_tasks
+                    else:
+                        del groups[owner_id]
+
+        if animal.in_enclosure:
+            enclosure = self.get_enclosure(animal.in_enclosure)
+            if animal in enclosure.contains:
+                enclosure.contains.remove(animal)
+
+
+        for staff in self.__staff:
+            if isinstance(staff, Veterinarian):
+
+                if staff.working_animal is animal:
+                    raise CannotRemoveAnimalError("Can not remove animals in treatment")
+
+                if animal in staff.assigned_animals:
+                    staff.assigned_animals.remove(animal)
+
+
+        self.__health_records.pop(animal_name, None)
 
         self.__animals.remove(animal)
 
@@ -361,16 +455,30 @@ class ZooSystem:
                 - enclosure_id: string
                     The enclosure id of enclosure object receiving the animal."""
 
+        if not isinstance(animal_name, str) or not isinstance(enclosure_id, str):
+            raise TypeError("Animal name and enclosure id must be of type string")
 
         animal = self.get_animal(animal_name)
         enclosure = self.get_enclosure(enclosure_id)
 
         if animal.treatment == True:
-            raise CannotRemoveAnimalError('Can not remove animals in treatment')
+            raise AnimalUnderTreatmentError('Can not move animals in treatment')
+
+        if animal.in_enclosure == enclosure_id:
+            raise ValueError("Animal is already in this enclosure")
+
+        if animal.in_enclosure is not None:
+            old = self.get_enclosure(animal.in_enclosure)
+            if enclosure.can_store(animal):
+                if animal in old.contains:
+                    old.contains.remove(animal)
+                    enclosure.store(animal)
+                    animal.in_enclosure = enclosure.id
+                    return
 
         if enclosure.can_store(animal):
             enclosure.store(animal)
-        animal.in_enclosure = enclosure.id
+            animal.in_enclosure = enclosure.id
 
     def get_enclosure_animals(self, enclosure_id: str):
         """ Retrieves all animal objects currently stored within a specific enclosure.
@@ -385,7 +493,7 @@ class ZooSystem:
         animals = enclosure.contains
         return animals
 
-    # Assigns animals to veterinarians
+
     def assign_animal_to_vet(self, animal_name: str, staff_id: str):
         """ Assigns an animal object to a veterinarian staff member for monitoring or treatment.
             Veterinarians are assigned real animal objects.
@@ -394,15 +502,28 @@ class ZooSystem:
                       The name of animal object to be assigned.
                   - staff_id: string
                       The staff id of veterinarian receiving the assignment."""
+        if not isinstance(animal_name, str) or not isinstance(staff_id, str):
+            raise TypeError("Animal name and staff id must be of type string")
 
         animal = self.get_animal(animal_name)
         vet = self.get_staff(staff_id)
 
         if vet.role != "Veterinarian":
             raise InvalidStaffRoleError('Can only assign Veterinarians to animals')
+
+        for staff_member in self.__staff:
+            if isinstance(staff_member, Veterinarian):
+                if animal in staff_member.assigned_animals:
+                    if staff_member.id == vet.id:
+
+                        raise DuplicateError(f"{animal.name} already assigned to {vet.id}")
+                    else:
+
+                        raise DuplicateError(f"{animal.name} is already assigned to veterinarian {staff_member.id}")
+
         vet.accept_assignment(animal)
 
-    # Assigns enclosures to keepers
+
     def assign_enclosure_to_keeper(self, enclosure_id: str, staff_id: str):
         """ Assigns an enclosure object to a keeper staff member for management and care duties.
             Keepers are assigned real enclosure objects.
@@ -412,6 +533,9 @@ class ZooSystem:
                 - staff_id: string
                     The staff id of keeper receiving the assignment."""
 
+        if not isinstance(enclosure_id, str) or not isinstance(staff_id, str):
+            raise TypeError("Enclosure id and staff id must be of type string")
+
         enclosure = self.get_enclosure(enclosure_id)
         keeper = self.get_staff(staff_id)
 
@@ -419,8 +543,8 @@ class ZooSystem:
             raise InvalidStaffRoleError('Can only assign Keepers to Enclosures')
 
         keeper.accept_assignment(enclosure)
-        enclosure.keepers.append(keeper.id)
-
+        if keeper.id not in enclosure.keepers:
+            enclosure.keepers.append(keeper.id)
 
     def validate_date(self, date: str):
         """ A helper method that validates a date string and ensures it follows the required DD/MM/YYYY format.

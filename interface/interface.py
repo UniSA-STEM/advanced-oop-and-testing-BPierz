@@ -38,6 +38,11 @@ class Interface:
             print (f"Animal added!\n{self.__system.animals[-1]}")
         except ValueError as e:
             print (f"Animal cannot be added: {e}\n")
+        except TypeError as e:
+            print (f"Animal cannot be added: {e}\n")
+        except NotInDatabaseError as e:
+            print (f"Animal cannot be added: {e}\n")
+
 
     def remove_animal(self, animal_name: str):
         """ Removes an animal object from the zoo system and displays confirmation to the user.
@@ -50,6 +55,8 @@ class Interface:
             print (f"Animal removed:\n{animal}\n")
         except NoSuchAnimalError as e:
             print (f"Cannot remove animal: {e}\n")
+        except TypeError as e:
+            print (f"Animal cannot be removed: {e}\n")
 
     def add_staff(self, name:str, age: int, gender:str, birthday:str, role = None):
         """ Adds a new staff member to the zoo system and displays confirmation to the user.
@@ -91,6 +98,9 @@ class Interface:
             print(f"Staff Member removed: {staff.name} : {staff.id}")
         except NoSuchStaffError as e:
             print(f"Cannot remove staff: {e}\n")
+        except TypeError as e:
+            print(f"Staff cannot be removed: {e}\n")
+
 
 
     def add_enclosure(self, size: int, type: str):
@@ -109,6 +119,8 @@ class Interface:
             print (f"Enclosure cannot be added: {e}\n")
         except TypeError as e:
             print (f"Enclosure cannot be added: {e}\n")
+        except NotInDatabaseError as e:
+            print (f"Enclosure cannot be added: {e}\n")
 
 
     def remove_enclosure(self, enclosure_id: str):
@@ -124,6 +136,8 @@ class Interface:
         except NoSuchEnclosureError as e:
             print(f"Cannot remove enclosure: {e}\n")
         except CannotRemoveEnclosureError as e:
+            print(f"Cannot remove enclosure: {e}\n")
+        except TypeError as e:
             print(f"Cannot remove enclosure: {e}\n")
 
 
