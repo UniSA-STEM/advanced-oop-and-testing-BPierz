@@ -165,6 +165,11 @@ class Animal(ABC):
     def enclosure(self):
         """ Returns the ID of the Enclosure in which the animal object can be stored. """
         return self.__enclosure
+    @hungry.setter
+    def hungry(self, hungry):
+        """ Sets the hungry status of the animal object. """
+        self.__hungry = hungry
+
 
 
 

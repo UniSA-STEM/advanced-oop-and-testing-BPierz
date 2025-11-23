@@ -1,3 +1,13 @@
+'''
+File: test_staff_keeper.py
+Description: This module contains unit tests for Keeper objects.
+Author: Borys Pierzchala
+ID: 110457330
+Username: PIEBY002
+This is my own work as defined by the University's Academic Integrity Policy.
+'''
+
+
 import pytest
 from domain.staff.staff_keeper import Keeper
 from exceptions import *

@@ -555,7 +555,7 @@ class ZooSystem:
                 - date: string
                     A validated date string formatted as DD/MM/YYYY. """
         if not isinstance(date, str):
-            raise ValueError("Date must be a string")
+            raise TypeError("Date must be a string")
 
         date_lower = date.strip().lower()
         today = datetime.today().strftime("%d/%m/%Y")
@@ -618,6 +618,8 @@ class ZooSystem:
         if key not in bucket:
             bucket[key] = []
         bucket[key].append(task)
+        task.assigned_to = staff_id
+        task.assigned = staff_id is not None
 
     def schedule_feeding_auto(self, date: str = None):
         """ Automatically creates feeding tasks for enclosures containing hungry animals.
@@ -861,10 +863,13 @@ class ZooSystem:
     def complete_task(self, task_id: str):
         date_key, state, owner_id, task = self.find_task_in_schedule(task_id)
 
-        staff = self.get_staff(owner_id)
-
         if state != "uncompleted":
             raise InvalidTaskAssignmentError("Task is already completed.")
+        if owner_id == "UNASSIGNED":
+            raise InvalidTaskAssignmentError("Cannot complete an unassigned task.")
+
+        self.get_staff(owner_id)
+
 
         if task.type == "Cleaning":
             enclosure = self.get_enclosure(task.enclosure_id)
@@ -872,8 +877,14 @@ class ZooSystem:
                 raise IncompleteTaskError("Enclosure is not clean enough to complete this task.")
 
         if task.type == "Feeding":
-            for animal_name in task.animal_id:
-                animal = self.get_animal(animal_name)
+            enclosure = self.get_enclosure(task.enclosure_id)
+
+            if getattr(task, "animals", None) == ["All Animals"]:
+                target_animals = enclosure.contains
+            else:
+                target_animals = [self.get_animal(name) for name in getattr(task, "animals", [])]
+
+            for animal in target_animals:
                 if animal.hungry:
                     raise IncompleteTaskError(f"{animal.name} is still hungry.")
 
@@ -881,7 +892,6 @@ class ZooSystem:
             animal = self.get_animal(task.animal_id)
             if animal.ailment:
                 raise IncompleteTaskError(f"{animal.name}'s treatment is not finished.")
-
 
         slot = self.__tasks_by_date[date_key]
         uncompleted = slot["uncompleted"]
@@ -892,15 +902,25 @@ class ZooSystem:
             del uncompleted[owner_id]
 
         completed.setdefault(owner_id, []).append(task)
-
         task.mark_complete()
 
     def create_health_entry(self, animal_name: str, date: str, issue: str, details: str, severity: int, treatment: str):
+        if not isinstance(animal_name, str):
+            raise TypeError("Animal name must be a string")
+
+        for field_name, field in [("issue", issue), ("details", details), ("treatment", treatment)]:
+            if not isinstance(field, str):
+                raise TypeError(f"{field_name.capitalize()} must be a string")
+            if not field.strip():
+                raise ValueError(f"{field_name.capitalize()} cannot be empty")
+        if not isinstance(severity, int):
+            raise TypeError("Severity must be an integer")
+        if not (0 <= severity <= 3):
+            raise ValueError("Severity must be between 0 and 3")
+
         animal = self.get_animal(animal_name)
         date_key = self.validate_date(date)
 
-        if animal not in self.__animals:
-            raise NoSuchAnimalError (f"Animal is not in the zoo system")
 
         log_entry = Entry(date_key, issue, details, severity, treatment)
         self.__health_records[animal_name].append(log_entry)
@@ -908,8 +928,13 @@ class ZooSystem:
 
 
     def get_animal_health_record(self, animal_name: str):
-        animal_record = self.__health_records[animal_name]
-        return animal_record
+        if not isinstance(animal_name, str):
+            raise TypeError("Animal name must be a string")
+
+        if animal_name not in self.__health_records:
+            raise NoSuchAnimalError(f"No health records exist for {animal_name}")
+
+        return self.__health_records[animal_name]
 
 
 

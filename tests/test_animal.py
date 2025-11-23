@@ -1,4 +1,14 @@
-import pytest
+'''
+File: test_animal.py
+Description: This module contains unit tests for animal objects.
+Author: Borys Pierzchala
+ID: 110457330
+Username: PIEBY002
+This is my own work as defined by the University's Academic Integrity Policy.
+'''
+
+
+
 from domain.animals.animal_mammal import Mammal
 from domain.animals.animal_bird import Bird
 from domain.animals.animal_reptile import Reptile

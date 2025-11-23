@@ -412,32 +412,46 @@ class Interface:
             print(f"Cannot complete task: {e}\n")
 
     def create_health_entry(self, animal_name: str, date: str, issue: str, details: str, severity: int, treatment: str):
+        try:
+            new_entry = self.__system.create_health_entry(animal_name, date, issue, details, severity, treatment)
+            print(f"\nHealth entry for {animal_name} created successfully!\n"
+                  f"{new_entry}\n")
+        except NoSuchAnimalError as e:
+            print(f"Cannot create health entry: {e}\n")
 
-        new_entry = self.__system.create_health_entry(animal_name, date, issue, details, severity, treatment)
-        print(f"\nHealth entry for {animal_name} created successfully!\n"
-              f"{new_entry}\n")
+        except TypeError as e:
+            print(f"Cannot create health entry: {e}\n")
+
+        except ValueError as e:
+            print(f"Cannot create health entry: {e}\n")
 
 
-    def display_health_record(self, animal_name: str = None, date: str = None):
 
-        if animal_name is None:
-            records = self.__system.health_records
-            print (records)
+    def display_health_record(self, animal_name: str = None):
+        try:
+            if animal_name is None:
+                records = self.__system.health_records
+                print (records)
 
-            print(f"\n------ ZOO HEALTH RECORDS ------\n")
-            for key in records:
-                print(f"\n---- {key}'s Health Records ----\n")
-                for entry in records[key]:
-                    print (entry)
+                print(f"\n------ ZOO HEALTH RECORDS ------\n")
+                for key in records:
+                    print(f"\n---- {key}'s Health Records ----\n")
+                    for entry in records[key]:
+                        print (entry)
 
-            print(f"------ END OF HEALTH RECORDS ------\n")
-            return
+                print(f"------ END OF HEALTH RECORDS ------\n")
+                return
 
-        animal_record = self.__system.get_animal_health_record(animal_name)
+            animal_record = self.__system.get_animal_health_record(animal_name)
 
-        print(f"\n---- {animal_name}'s Health Records ----\n")
-        for entry in animal_record:
-            print(f"{entry}\n")
+            print(f"\n---- {animal_name}'s Health Records ----\n")
+            for entry in animal_record:
+                print(f"{entry}\n")
 
-        print(f"---- End of Health Records ----\n")
+            print(f"---- End of Health Records ----\n")
+
+        except TypeError as e:
+            print(f"Cannot display health record: {e}\n")
+        except NoSuchAnimalError as e:
+            print(f"Cannot display health record: {e}\n")
 

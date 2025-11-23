@@ -1,3 +1,13 @@
+'''
+File: test_staff.py
+Description: This module contains unit tests for Staff objects.
+Author: Borys Pierzchala
+ID: 110457330
+Username: PIEBY002
+This is my own work as defined by the University's Academic Integrity Policy.
+'''
+
+
 import pytest
 from domain.staff.staff import Staff
 

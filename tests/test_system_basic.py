@@ -1,9 +1,17 @@
-import pytest
+'''
+File: test_system_basic.py
+Description: This module contains unit tests for ZooSystem objects' basic functionalities.
+Author: Borys Pierzchala.
+Author: Borys Pierzchala
+ID: 110457330
+Username: PIEBY002
+This is my own work as defined by the University's Academic Integrity Policy.
+'''
 
-from domain import enclosures
+
+import pytest
 from domain.enclosures.enclosure import Enclosure
 from exceptions import *
-from domain.staff.staff import Staff
 from system.zoo_system import ZooSystem
 from zoodata.zoo_data import *
 
@@ -12,17 +20,6 @@ from zoodata.zoo_data import *
 def system():
     return ZooSystem("Sue's Zoo")
 
-@pytest.fixture
-def enclosure():
-    return Enclosure(50, "Savannah", "50Sav1")
-
-@pytest.fixture
-def enclosure2():
-    return Enclosure(50, "Savannah", "50Sav2")
-
-@pytest.fixture
-def staff_member():
-    return Staff("John Doe", 30, "Male", "12/12/1994", "JohDoe94")
 
 def test_init(system):
     assert system.enclosures == []

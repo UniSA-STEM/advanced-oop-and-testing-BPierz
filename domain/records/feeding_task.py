@@ -29,7 +29,3 @@ class FeedingTask(Task):
     @property
     def animals(self):
         return list(self.__animals) if self.__animals is not None else []
-
-
-    def mark_complete(self):
-        self.__complete = True

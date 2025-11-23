@@ -1,3 +1,13 @@
+'''
+File: test_enclosure.py
+Description: This module contains unit tests for enclosure objects.
+Author: Borys Pierzchala
+ID: 110457330
+Username: PIEBY002
+This is my own work as defined by the University's Academic Integrity Policy.
+'''
+
+
 from domain.enclosures.enclosure import Enclosure
 from domain.animals.animal_mammal import Mammal
 import pytest
