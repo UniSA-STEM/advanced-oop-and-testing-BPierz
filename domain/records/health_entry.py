@@ -1,3 +1,15 @@
+'''
+File: health_entry.py
+Description: This module defines the Entry class.
+             The Entry class represents a single entry in the zoo's health records. It stores and validates data for
+             recording animal ailments and treatments as well as provides a string representation of the
+             single entry.
+
+Author: Borys Pierzchala
+ID: 110457330
+Username: PIEBY002
+This is my own work as defined by the University's Academic Integrity Policy.
+'''
 
 class Entry:
 

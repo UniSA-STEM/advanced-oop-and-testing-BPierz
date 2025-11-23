@@ -62,7 +62,6 @@ class ZooSystem:
         """ Returns the dictionary storing all scheduled task objects grouped by date. """
         return self.__tasks_by_date
 
-
     def create_enclosure_code(self, type: str, size: int) -> str:
         """ A helper method used to generate a unique enclosure identification code for enclosures.
             Enclosure objects are identified internally by their enclosure id.
@@ -94,7 +93,6 @@ class ZooSystem:
 
         return f"{id_code}{count}"
 
-
     def create_staff_id(self, staff_name: str, staff_birthday: str):
         """ A helper method used to generate a unique staff identification code for staff members.
             Staff objects are identified internally by their staff id.
@@ -108,21 +106,20 @@ class ZooSystem:
                     The unique staff id for staff member object. """
         words = staff_name.split()
         if len(words) <= 1:
-            raise ValueError ("Full name of staff member is required")
+            raise ValueError("Full name of staff member is required")
 
-        first  = words[0]
+        first = words[0]
         if len(words) == 2:
             last = words[1]
-            code = first[:3]+last[:3]
+            code = first[:3] + last[:3]
         else:
             middle = words[1]
             last = words[-1]
-            code = first[:3]+middle[:1]+last[:2]
+            code = first[:3] + middle[:1] + last[:2]
 
         staff_id = f"{code}{staff_birthday[-2:]}"
 
         return staff_id
-
 
     def get_animal(self, animal_name: str):
         """ A helper method used to retrieve an Animal object from system storage based on animal.name string.
@@ -141,7 +138,6 @@ class ZooSystem:
 
         raise NoSuchAnimalError('No such animal exists at the Zoo')
 
-
     def get_enclosure(self, enclosure_id: str):
         """ A helper method used to retrieve an Enclosure object from system storage based on enclosure.id string.
             Parameters:
@@ -158,7 +154,6 @@ class ZooSystem:
             if i.id == lookup_id:
                 return i
         raise NoSuchEnclosureError('No such enclosure exists at the Zoo')
-
 
     def get_staff(self, staff_id: str):
         """ A helper method used to retrieve a Staff object from system storage based on staff.id string.
@@ -193,11 +188,9 @@ class ZooSystem:
         if norm_type not in self.ENCLOSURES:
             raise NotInDatabaseError('No such enclosure exists at the Zoo')
 
-
         id_code = self.create_enclosure_code(type, size)
         new_enclosure = Enclosure(size, type, id_code)
         self.__enclosures.append(new_enclosure)
-
 
     def add_animal(self, type: str, name: str, species: str, age: int):
         """ A helper method used to create and store a new Animal object of appropriate subclass.
@@ -220,7 +213,8 @@ class ZooSystem:
         if norm_type not in self.ANIMAL_TYPES:
             raise NotInDatabaseError(f'Animal {type} not in database. Try Mammal, Reptile or Bird')
         if norm_species not in self.ANIMALS:
-            raise NotInDatabaseError(f'Animal {species} not in database. Add {species} to database manually or try again')
+            raise NotInDatabaseError(
+                f'Animal {species} not in database. Add {species} to database manually or try again')
         if not isinstance(age, int):
             raise TypeError(f'Age must be a number')
         if age < 0:
@@ -236,9 +230,11 @@ class ZooSystem:
                 break
 
         if not found:
-            raise NotInDatabaseError(f'Animal {species} not in database. Add {species} to database manually or try again')
+            raise NotInDatabaseError(
+                f'Animal {species} not in database. Add {species} to database manually or try again')
         if age > info["max_age"]:
-            raise ValueError(f'{age} years of age for this species exceeds reasonable age of maximum {info["max_age"]} for this species.')
+            raise ValueError(
+                f'{age} years of age for this species exceeds reasonable age of maximum {info["max_age"]} for this species.')
 
         for animal in self.__animals:
             if animal.name == name:
@@ -262,9 +258,7 @@ class ZooSystem:
             sound = info["sound"]
             new_animal = Reptile(name, species, age, enclosure, diet, sound)
 
-
         self.__animals.append(new_animal)
-
 
     def add_staff(self, name: str, age: int, gender: str, birthday: str, role=None):
         """ Used to create and store a new Staff object or Staff subclass object.
@@ -282,7 +276,7 @@ class ZooSystem:
 
         if not isinstance(name, str) or not isinstance(gender, str) or not isinstance(birthday, str):
             raise TypeError("Name, gender and birthday must be a string")
-        if not isinstance (age, int):
+        if not isinstance(age, int):
             raise TypeError("Age must be a number")
 
         name = name.strip()
@@ -291,7 +285,6 @@ class ZooSystem:
 
         date = self.validate_date(birthday)
         staff_id = self.create_staff_id(name, birthday)
-
 
         for staff in self.__staff:
 
@@ -354,7 +347,6 @@ class ZooSystem:
                     break
         self.__staff.remove(staff)
 
-
     def remove_enclosure(self, enclosure_id: str):
         """Used to remove an Enclosure object from system storage based on enclosure id string.
                Parameters:
@@ -389,7 +381,6 @@ class ZooSystem:
                     groups[staff_id] = [t for t in tasks if not getattr(t, "enclosure_id", None) == enclosure_id]
 
         self.__enclosures.remove(enclosure)
-
 
     def remove_animal(self, animal_name: str):
         """ Used to remove an Animal object from system storage based on animal name string.
@@ -431,7 +422,6 @@ class ZooSystem:
             if animal in enclosure.contains:
                 enclosure.contains.remove(animal)
 
-
         for staff in self.__staff:
             if isinstance(staff, Veterinarian):
 
@@ -440,7 +430,6 @@ class ZooSystem:
 
                 if animal in staff.assigned_animals:
                     staff.assigned_animals.remove(animal)
-
 
         self.__health_records.pop(animal_name, None)
 
@@ -493,7 +482,6 @@ class ZooSystem:
         animals = enclosure.contains
         return animals
 
-
     def assign_animal_to_vet(self, animal_name: str, staff_id: str):
         """ Assigns an animal object to a veterinarian staff member for monitoring or treatment.
             Veterinarians are assigned real animal objects.
@@ -522,7 +510,6 @@ class ZooSystem:
                         raise DuplicateError(f"{animal.name} is already assigned to veterinarian {staff_member.id}")
 
         vet.accept_assignment(animal)
-
 
     def assign_enclosure_to_keeper(self, enclosure_id: str, staff_id: str):
         """ Assigns an enclosure object to a keeper staff member for management and care duties.
@@ -650,7 +637,6 @@ class ZooSystem:
             if task.id not in existing_ids:
                 self.add_task(task, date=date_key)
 
-
     def schedule_cleaning_auto(self, date: str = None):
         """ Automatically creates cleaning tasks for enclosures requiring cleaning attention.
             Parameters:
@@ -701,7 +687,7 @@ class ZooSystem:
         date_key, status, owner_id, task = self.find_task_in_schedule(task_id)
 
         if status != "uncompleted":
-            raise InvalidTaskAssignmentError ("Cannot assign a completed task")
+            raise InvalidTaskAssignmentError("Cannot assign a completed task")
         if task.type in ("Feeding", "Cleaning") and staff.role != "Keeper":
             raise InvalidStaffRoleError("Can only assign Keepers to feeding and cleaning tasks")
         if task.type == "Treatment" and staff.role != "Veterinarian":
@@ -710,11 +696,11 @@ class ZooSystem:
         if task.type in ("Feeding", "Cleaning"):
             enclosure = self.get_enclosure(task.enclosure_id)
             if enclosure not in staff.assigned_enclosures:
-                raise InvalidTaskAssignmentError (f"Keeper {staff.id} is not assigned to enclosure {enclosure.id}")
+                raise InvalidTaskAssignmentError(f"Keeper {staff.id} is not assigned to enclosure {enclosure.id}")
         if task.type == "Treatment":
             animal = self.get_animal(task.animal_id)
             if animal not in staff.assigned_animals:
-                raise InvalidTaskAssignmentError (f"Veterinarian {staff.id} is not assigned to animal {animal.name}")
+                raise InvalidTaskAssignmentError(f"Veterinarian {staff.id} is not assigned to animal {animal.name}")
 
         slot = self.__tasks_by_date[date_key]
         uncompleted = slot["uncompleted"]
@@ -730,7 +716,6 @@ class ZooSystem:
 
         if task not in staff.tasks:
             staff.tasks.append(task)
-
 
     def iter_tasks(self, date: str = None, status: str = None, assigned: bool = None, staff_id: str = None):
         """ Iterates through all task objects in the scheduling system with optional filtering.
@@ -770,7 +755,6 @@ class ZooSystem:
                                 continue
                         yield date, st, group, task
 
-
     def task_exists(self, check_task, date: str = None):
         """ A helper method that checks whether a task object already exists within the scheduling system.
             Parameters:
@@ -801,13 +785,18 @@ class ZooSystem:
         raise NoSuchTaskError(f"No task found with ID: {task_id}")
 
     def find_task_in_schedule(self, task_id: str):
-        """Locate a task by id in the schedule.
+        """A helper method used to locate a task object within the scheduling system
+        based on its task ID.
+
+        Parameters:
+            - task_id: string
+                The unique identifier of the task being searched for.
 
         Returns:
-            (date_key, state, owner_id, task)
-        Raises:
-            NoSuchTaskError if the task cannot be found.
-        """
+            - result: tuple
+                A tuple containing:
+                    (date_key, state, owner_id, task)"""
+
         for date_key, slot in self.__tasks_by_date.items():
             for state in ("uncompleted", "completed"):
                 if state not in slot:
@@ -819,48 +808,60 @@ class ZooSystem:
 
         raise NoSuchTaskError(f"No task found with ID: {task_id}")
 
-
     def create_task_manual(self, task_type: str, enclosure_id: str = None, animal_names=None, date: str = None):
-            """
-            Creates and adds a new task object manually to the schedule.
-            Supports Feeding, Cleaning, and Treatment tasks.
-            - Feeding requires enclosure_id + list of animal names
-            - Cleaning requires enclosure_id only
-            - Treatment requires a single animal name (string)
-            """
+        """Creates a new task object manually and adds it to the scheduling system.
 
-            normalised_type = task_type.strip().capitalize()
-            date_key = self.get_date_key(date)
+        Parameters:
+            - task_type: string
+                The type of task to create ('Feeding', 'Cleaning', or 'Treatment').
+            - enclosure_id: string (optional)
+                The enclosure associated with the task (required for Feeding and Cleaning).
+            - animal_names: list or string (optional)
+                For Feeding: list of animal names.
+                For Treatment: a single animal name string.
+            - date: string (optional)
+                The scheduled date for the task. If None, task is marked as 'UNSCHEDULED'.
 
+        Returns:
+            - new_task: Task
+                The task object that was created and stored."""
 
-            if normalised_type == "Feeding":
-                if enclosure_id is None or not animal_names:
-                    raise IncompleteTaskError("Feeding requires enclosure ID and a list of animal names.")
-                if not isinstance(animal_names, list):
-                    raise TypeError("animal_names must be a list for Feeding tasks.")
-                new_task = FeedingTask(enclosure_id, animal_names, date_key)
+        normalised_type = task_type.strip().capitalize()
+        date_key = self.get_date_key(date)
 
-            elif normalised_type == "Cleaning":
-                if enclosure_id is None:
-                    raise IncompleteTaskError("Cleaning requires enclosure ID.")
-                new_task = CleaningTask(enclosure_id, date_key)
+        if normalised_type == "Feeding":
+            if enclosure_id is None or not animal_names:
+                raise IncompleteTaskError("Feeding requires enclosure ID and a list of animal names.")
+            if not isinstance(animal_names, list):
+                raise TypeError("animal_names must be a list for Feeding tasks.")
+            new_task = FeedingTask(enclosure_id, animal_names, date_key)
 
-            elif normalised_type == "Treatment":
-                if not isinstance(animal_names, str):
-                    raise TypeError("Treatment requires a single animal name (string).")
-                new_task = TreatmentTask(animal_names, date_key)
+        elif normalised_type == "Cleaning":
+            if enclosure_id is None:
+                raise IncompleteTaskError("Cleaning requires enclosure ID.")
+            new_task = CleaningTask(enclosure_id, date_key)
 
-            else:
-                raise IncompleteTaskError(f"Invalid task type: {task_type}")
+        elif normalised_type == "Treatment":
+            if not isinstance(animal_names, str):
+                raise TypeError("Treatment requires a single animal name (string).")
+            new_task = TreatmentTask(animal_names, date_key)
 
-            if self.task_exists(new_task, date):
-                raise IncompleteTaskError("Task already exists.")
+        else:
+            raise IncompleteTaskError(f"Invalid task type: {task_type}")
 
-            self.add_task(new_task, date=date)
-            return new_task
+        if self.task_exists(new_task, date):
+            raise IncompleteTaskError("Task already exists.")
 
+        self.add_task(new_task, date=date)
+        return new_task
 
     def complete_task(self, task_id: str):
+        """Marks an existing task as completed after validating all completion requirements.
+
+           Parameters:
+               - task_id: string
+                   The unique identifier of the task to complete."""
+
         date_key, state, owner_id, task = self.find_task_in_schedule(task_id)
 
         if state != "uncompleted":
@@ -869,7 +870,6 @@ class ZooSystem:
             raise InvalidTaskAssignmentError("Cannot complete an unassigned task.")
 
         self.get_staff(owner_id)
-
 
         if task.type == "Cleaning":
             enclosure = self.get_enclosure(task.enclosure_id)
@@ -904,7 +904,29 @@ class ZooSystem:
         completed.setdefault(owner_id, []).append(task)
         task.mark_complete()
 
+
     def create_health_entry(self, animal_name: str, date: str, issue: str, details: str, severity: int, treatment: str):
+        """Creates a new health record entry for a given animal and adds it to its
+        medical history.
+
+        Parameters:
+            - animal_name: string
+                The name of the animal this health entry belongs to.
+            - date: string
+                The date of the entry in DD/MM/YYYY format, or keywords accepted by validate_date.
+            - issue: string
+                A short description of the medical issue.
+            - details: string
+                Detailed notes on the condition.
+            - severity: integer
+                A severity rating between 0 and 3.
+            - treatment: string
+                The prescribed treatment or action taken.
+
+        Returns:
+            - log_entry: Entry
+                The Entry object representing the created health record."""
+
         if not isinstance(animal_name, str):
             raise TypeError("Animal name must be a string")
 
@@ -921,13 +943,22 @@ class ZooSystem:
         animal = self.get_animal(animal_name)
         date_key = self.validate_date(date)
 
-
         log_entry = Entry(date_key, issue, details, severity, treatment)
         self.__health_records[animal_name].append(log_entry)
         return log_entry
 
 
     def get_animal_health_record(self, animal_name: str):
+        """Retrieves all stored health record entries for a given animal.
+
+        Parameters:
+            - animal_name: string
+                The name of the animal whose health records are being requested.
+
+        Returns:
+            - records: list[Entry]
+                A list of Entry objects representing the animal's health history."""
+
         if not isinstance(animal_name, str):
             raise TypeError("Animal name must be a string")
 
@@ -935,8 +966,3 @@ class ZooSystem:
             raise NoSuchAnimalError(f"No health records exist for {animal_name}")
 
         return self.__health_records[animal_name]
-
-
-
-
-

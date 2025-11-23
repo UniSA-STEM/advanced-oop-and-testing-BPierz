@@ -14,10 +14,10 @@ This is my own work as defined by the University's Academic Integrity Policy.
 
 
 class Staff:
-    class Staff:
-        """ A parent class representing a generic staff member within the zoo system.
-            This class provides shared attributes and behaviours for all staff roles.
-            Subclasses extend this to model specific staff roles such as Keeper and Veterinarian"""
+
+    """ A parent class representing a generic staff member within the zoo system.
+        This class provides shared attributes and behaviours for all staff roles.
+        Subclasses extend this to model specific staff roles such as Keeper and Veterinarian"""
 
     def __init__(self, name: str, age: int, gender: str, birthday: str, id: str):
         """ Creates a Staff object and initialises shared staff attributes.

@@ -1,5 +1,5 @@
 
-'''
+"""
 File: interface.py
 Description: This module represents a user interface and holds the class Interface. The Interface class handles exceptions
             raised by the classes below and outputs user-friendly information and messages on operations performed by
@@ -8,8 +8,9 @@ Description: This module represents a user interface and holds the class Interfa
 Author: Borys Pierzchala
 ID: 110457330
 Username: PIEBY002
-This is my own work as defined by the University's Academic Integrity Policy.'''
-from domain.staff.staff import Staff
+This is my own work as defined by the University's Academic Integrity Policy."""
+
+
 from exceptions import *
 from system.zoo_system import ZooSystem
 
@@ -400,7 +401,13 @@ class Interface:
             print(f"Cannot assign task: {e}\n")
 
     def complete_task(self, staff_id, task_id):
-        """ Allows a task member to interact with the system and mark a task as complete."""
+        """ Represents a staff member marking a task as complete in the system.
+        Parameters:
+            - staff_id: string
+            The staff id of the staff member marking a task as complete.
+            - task_id: string
+            The task id of the task that is to be marked as completed.
+        """
 
         try:
             self.__system.complete_task(task_id)
@@ -412,6 +419,22 @@ class Interface:
             print(f"Cannot complete task: {e}\n")
 
     def create_health_entry(self, animal_name: str, date: str, issue: str, details: str, severity: int, treatment: str):
+        """ Creates a new health record entry for the specified animal and displays
+        a confirmation message to the user.
+
+        Parameters:
+            - animal_name: string
+                The name of the animal the health entry belongs to.
+            - date: string
+                The date of the entry, expected in DD/MM/YYYY format.
+            - issue: string
+                A short description of the medical issue.
+            - details: string
+                Detailed notes describing the condition.
+            - severity: integer
+                A severity rating between 0 and 3 (where 3 is maximum).
+            - treatment: string
+                The prescribed treatment or recommended action. """
         try:
             new_entry = self.__system.create_health_entry(animal_name, date, issue, details, severity, treatment)
             print(f"\nHealth entry for {animal_name} created successfully!\n"
@@ -428,6 +451,15 @@ class Interface:
 
 
     def display_health_record(self, animal_name: str = None):
+        """Displays health records stored in the system. If an animal name is provided,
+        only that animal’s health history is shown. If no name is given, all health
+        records in the zoo are displayed.
+
+        Parameters:
+            - animal_name: string (optional)
+                The name of the animal whose health record should be displayed.
+                If omitted, all health records are printed."""
+
         try:
             if animal_name is None:
                 records = self.__system.health_records
